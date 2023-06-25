@@ -1,29 +1,14 @@
-import React, { useRef, useState } from 'react';
-import { sendMessage, setNewChat } from '../features/chats/chatSlice';
+import React, { useRef } from 'react';
+import { setNewChat } from '../features/chats/chatSlice';
 import { useDispatch } from 'react-redux';
 import msToLastSeen from '../helper/msToLastSeen';
+import SendMessage from './SendMessage';
 
 const NewChat = ({ newChat, setSubcribedRooms, makeItResponsive }) => {
-    // const { sendMessage, removeChatPage } = useContext(ChatContext);
-    const [message, setMessage] = useState('');
-    const messagesRef = useRef();
-    const { name, _id, online, lastSeen } = newChat;
-    const dispatch = useDispatch();
 
-    // Function for sending message
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (message) {
-            try {
-                const data = await dispatch(sendMessage({ message, otherUserId: _id })).unwrap();
-                setMessage('');
-                // adding this newly created roomId to subscribedRoom to avoid any conflict
-                setSubcribedRooms(prev => prev ? [...prev, data.user.roomId] : [data.user.roomId]);
-            } catch (error) {
-                console.log(error);
-            };
-        };
-    };
+    const messagesRef = useRef();
+    const { name, online, lastSeen } = newChat;
+    const dispatch = useDispatch();
 
     const navigateBack = () => {
         makeItResponsive();
@@ -44,13 +29,7 @@ const NewChat = ({ newChat, setSubcribedRooms, makeItResponsive }) => {
                 <div className="messages" id='messages' ref={messagesRef}>
                 </div>
             </div>
-            <div className="send-message-section">
-                <h4 className="name-tag">{name.slice(0, 1)}</h4>
-                <form onSubmit={handleSendMessage}>
-                    <input type="text" className="input-field" required value={message} onChange={e => setMessage(e.target.value)} />
-                    <p className="send-button" onClick={handleSendMessage}>⩥</p>
-                </form>
-            </div>
+            <SendMessage user={newChat} setSubcribedRooms={setSubcribedRooms} />
         </>
     )
 }

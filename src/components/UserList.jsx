@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from './Loading';
 import { filterUsersList, setNewChat } from '../features/chats/chatSlice';
 
-const UserList = ({ userListRef, fetchRoomConversation }) => {
+const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
 
     const { isLoading, isError, users, recentConversations } = useSelector(state => state.chat);
     const dispatch = useDispatch();
@@ -30,6 +30,8 @@ const UserList = ({ userListRef, fetchRoomConversation }) => {
             fetchRoomConversation(roomId, _id);
         } else {
             dispatch(setNewChat(user));
+            // for small screen to show chatpage for new chat
+            makeItResponsive()
         };
     };
 

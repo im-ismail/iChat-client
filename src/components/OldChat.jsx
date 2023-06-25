@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import msToTime from '../helper/msToTime';
 import msToLastSeen from '../helper/msToLastSeen';
 import { useDispatch } from 'react-redux';
-import { sendMessage, setRoomConversation } from '../features/chats/chatSlice';
-import { emitTyping } from '../services/socket';
+import { setRoomConversation } from '../features/chats/chatSlice';
+import SendMessage from './SendMessage';
 
 const OldChat = ({ roomConversation, makeItResponsive }) => {
 
-    const [message, setMessage] = useState('');
     const [currentRoom, setCurrentRoom] = useState(null);
     const messagesRef = useRef();
     const user = roomConversation?.user ?? {};
@@ -15,20 +14,6 @@ const OldChat = ({ roomConversation, makeItResponsive }) => {
     const { _id: otherUserId, roomId, name, online, lastSeen, typing } = user;
     let initialDate = '01/01/1970';
     const dispatch = useDispatch();
-
-    // function for handling change event
-    const handleChange = (e) => {
-        setMessage(e.target.value);
-        emitTyping(roomId);
-    };
-    // Function for sending message
-    const handleSendMessage = (e) => {
-        e.preventDefault();
-        if (message) {
-            dispatch(sendMessage({ message, roomId, otherUserId }));
-            setMessage('');
-        };
-    };
 
     const navigateBack = () => {
         makeItResponsive();
@@ -94,13 +79,7 @@ const OldChat = ({ roomConversation, makeItResponsive }) => {
                     }
                 </div>
             </div>
-            <div className="send-message-section">
-                <h4 className="name-tag">{name.slice(0, 1)}</h4>
-                <form onSubmit={handleSendMessage}>
-                    <input type="text" className="input-field" required value={message} onChange={handleChange} />
-                    <p className="send-button" onClick={handleSendMessage}>⩥</p>
-                </form>
-            </div>
+            <SendMessage user={user} />
         </>
     )
 }

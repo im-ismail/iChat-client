@@ -137,7 +137,7 @@ const Home = () => {
                     <input type="search" name="listSearch" className="list-search" placeholder="Search or start a new chat" onChange={handleInputChange} />
                     <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
-                <UserList userListRef={userListRef} fetchRoomConversation={fetchRoomConversation} />
+                <UserList userListRef={userListRef} fetchRoomConversation={fetchRoomConversation} makeItResponsive={makeItResponsive} />
                 {currentUser && <Profile profileRef={profileRef} />}
                 <ChatList fetchRoomConversation={fetchRoomConversation} />
             </div>
