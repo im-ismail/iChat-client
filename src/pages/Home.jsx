@@ -8,6 +8,7 @@ import ChatList from '../components/ChatList';
 import ChatPage from '../components/ChatPage';
 import { joinRoom } from '../services/socket';
 import Profile from '../components/Profile';
+import { serverUrl } from '../api/apiEndpoint';
 
 const Home = () => {
 
@@ -123,8 +124,8 @@ const Home = () => {
             <div className="main-page" ref={mainPageRef}>
                 <div className="user-profile">
                     <div className="user-profile-details">
-                        <div className="user-profile-pic">
-                            <img src="images/profile.jpg" alt="" onClick={showProfilePage} />
+                        <div>
+                            {currentUser && <img src={`${serverUrl}/${currentUser.image}`} alt="dp" onClick={showProfilePage} />}
                         </div>
                         {currentUser && <h3 className='name'>{currentUser.name}</h3>}
                     </div>

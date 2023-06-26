@@ -4,6 +4,7 @@ import msToLastSeen from '../helper/msToLastSeen';
 import { useDispatch } from 'react-redux';
 import { setRoomConversation } from '../features/chats/chatSlice';
 import SendMessage from './SendMessage';
+import { serverUrl } from '../api/apiEndpoint';
 
 const OldChat = ({ roomConversation, makeItResponsive }) => {
 
@@ -11,7 +12,7 @@ const OldChat = ({ roomConversation, makeItResponsive }) => {
     const messagesRef = useRef();
     const user = roomConversation?.user ?? {};
     const messages = roomConversation?.messages ?? [];
-    const { _id: otherUserId, roomId, name, online, lastSeen, typing } = user;
+    const { _id: otherUserId, roomId, name, image, online, lastSeen, typing } = user;
     let initialDate = '01/01/1970';
     const dispatch = useDispatch();
 
@@ -40,10 +41,12 @@ const OldChat = ({ roomConversation, makeItResponsive }) => {
         <>
             <div className="navigation">
                 <span className="go-back" onClick={navigateBack}>🔙</span>
-                <img src="images/dp.jpg" alt="" className="participant-profile-pic" />
-                <div className="info">
-                    <h4 className="participant-name">{name}</h4>
-                    <p className="last-seen">{typing ? 'typing...' : online ? 'Online' : msToLastSeen(lastSeen)}</p>
+                <div className="chat-partner-info">
+                    <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
+                    <div className="info">
+                        <h4 className="chat-partner-name">{name}</h4>
+                        <p className="last-seen">{typing ? 'typing...' : online ? 'Online' : msToLastSeen(lastSeen)}</p>
+                    </div>
                 </div>
             </div>
             <div className="chat-screen">

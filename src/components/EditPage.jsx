@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { updateUserDetails } from '../features/chats/chatSlice';
+import { updateUser } from '../features/chats/chatSlice';
 
 const Edit = ({ editPageRef, updateType, userId }) => {
 
@@ -26,7 +26,7 @@ const Edit = ({ editPageRef, updateType, userId }) => {
         e.preventDefault();
         try {
             setIsIdle(true);
-            await dispatch(updateUserDetails({ inputValue, userId })).unwrap();
+            await dispatch(updateUser({ inputValue, userId })).unwrap();
             closeEditPage();
         } catch (error) {
             console.log(error);
@@ -50,12 +50,12 @@ const Edit = ({ editPageRef, updateType, userId }) => {
     };
 
     return (
-        <div className="edit container" ref={editPageRef}>
+        <div className="edit-page" ref={editPageRef}>
             <div className='navigation'>
                 <span className="go-back" onClick={closeEditPage}>🔙</span>
                 <span>{updateType === 'name' ? 'Edit name' : updateType === 'number' ? 'Change number' : 'Change password'}</span>
             </div>
-            <form className='login-form' onSubmit={handleProfileUpdate}>
+            <form onSubmit={handleProfileUpdate}>
                 {updateType === 'name' && <div className="input">
                     <input type="text" name='name' placeholder='Enter your name' required onChange={handleChange} value={name} />
                 </div>}

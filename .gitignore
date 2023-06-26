@@ -4,6 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
+
+# user defined folders
 src/styles
 
 # testing

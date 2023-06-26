@@ -41,7 +41,7 @@ const Delete = ({ deletePageRef, userId }) => {
     };
 
     return (
-        <div className="edit container" ref={deletePageRef}>
+        <div className="delete-page" ref={deletePageRef}>
             <div className='navigation'>
                 <span className="go-back" onClick={closeDeletePage}>🔙</span>
                 <span>Delete Account</span>

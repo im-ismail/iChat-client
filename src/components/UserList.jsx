@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // import '../styles/userList.css';
 import Loading from './Loading';
 import { filterUsersList, setNewChat } from '../features/chats/chatSlice';
+import { serverUrl } from '../api/apiEndpoint';
 
 const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
 
@@ -36,13 +37,13 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
     };
 
     return (
-        <div className="users" ref={userListRef}>
+        <div className="user-list-page" ref={userListRef}>
             <>
                 {isLoading && !users && <Loading />}
                 {isError && !users && <p>Some error occured</p>}
             </>
             {
-                users && <><div className='stick'>
+                users && <><div>
                     <div className='close'>
                         <i className="fa-regular fa-circle-xmark" onClick={closeUserList}></i>
                     </div>
@@ -51,15 +52,15 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
                         <i className="fa-solid fa-magnifying-glass"></i>
                     </div>
                 </div>
-                    <div className="userList">
+                    <div className="user-list">
                         {
                             users.map((user, index) => {
-                                const { name, number } = user;
+                                const { name, number, image } = user;
                                 let num = number.toString();
                                 num = num.slice(0, 2) + '****' + num.slice(6);
                                 return <div className="user" key={index} onClick={() => handleUserListClick(user)}>
                                     <div>
-                                        <img src={user.image || 'images/dp.jpg'} alt="" className="participant-profile-pic" />
+                                        <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
                                     </div>
                                     <div>
                                         <h3>{name}</h3>

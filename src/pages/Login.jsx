@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 // import '../styles/login.css';
-import { handleUserLogin } from '../features/chats/chatSlice';
+import { userLogin } from '../features/chats/chatSlice';
 
 const Login = () => {
 
@@ -29,7 +29,7 @@ const Login = () => {
         e.preventDefault();
         try {
             setIsIdle(true);
-            await dispatch(handleUserLogin(userData)).unwrap();
+            await dispatch(userLogin(userData)).unwrap();
             setUserData({
                 number: '',
                 password: ''
@@ -45,7 +45,7 @@ const Login = () => {
         <>
             {
                 !isLoggedIn &&
-                <div className="container">
+                <div className="form-container">
                     <h1 className="heading">Login to your iChat account</h1>
                     <form id="login-form" onSubmit={handleSubmit}>
                         <div className="input">

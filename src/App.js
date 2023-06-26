@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Error from "./pages/Error";
 import { useEffect } from "react";
-import { checkUserAuthentication } from "./features/chats/chatSlice";
+import { authenticateUser } from "./features/chats/chatSlice";
 import io from 'socket.io-client';
 import configureSocket from "./services/socket";
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,7 +19,7 @@ function App() {
   const dispatch = useDispatch();
   // Checking user authentication
   useEffect(() => {
-    dispatch(checkUserAuthentication());
+    dispatch(authenticateUser());
   }, []);
 
   // Initialising socket connection

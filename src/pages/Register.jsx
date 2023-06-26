@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 // import '../styles/login.css';
-import { handleUserRegistration } from '../features/chats/chatSlice';
+import { userRegistration } from '../features/chats/chatSlice';
 
 const Register = () => {
 
@@ -11,6 +11,7 @@ const Register = () => {
         name: '',
         number: '',
         dob: '',
+        gender: 'male',
         password: ''
     });
     const [isIdle, setIsIdle] = useState(false);
@@ -32,7 +33,7 @@ const Register = () => {
         e.preventDefault();
         try {
             setIsIdle(true);
-            await dispatch(handleUserRegistration(userData)).unwrap();
+            await dispatch(userRegistration(userData)).unwrap();
             setUserData({
                 name: '',
                 number: '',
@@ -40,7 +41,7 @@ const Register = () => {
                 password: ''
             });
             setTimeout(() => {
-                navigate('/');
+                navigate('/login');
             }, 2000);
         } catch (error) {
             console.log(error);
@@ -53,7 +54,7 @@ const Register = () => {
         <>
             {
                 !isLoggedIn &&
-                <div className="container">
+                <div className="form-container">
                     <h1 className="heading">Create your iChat account</h1>
                     <form id="login-form" onSubmit={handleSubmit}>
                         <div className="input">
@@ -64,6 +65,13 @@ const Register = () => {
                         </div>
                         <div className="input">
                             <input id="dob" type="text" name="dob" placeholder="Date of birth" required onChange={handleChange} value={dob} />
+                        </div>
+                        <div className="input">
+                            <label htmlFor="gender">Gender : </label>
+                            <select name="gender" id="gender" required onChange={handleChange}>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
                         </div>
                         <div className="input">
                             <input id="password" type="password" name="password" placeholder="Password" required onChange={handleChange} value={password} />

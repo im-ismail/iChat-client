@@ -1,25 +1,25 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
 import { toast } from 'react-toastify';
-import { registerUser, loginUser, authenticateUser, getAllUser, updateUser, logout, deleteUser } from '../../api/userAPI';
-import { createRoom, recentConversations, roomConversation, sendMsg } from '../../api/chatAPI';
+
+import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
+import { createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, recentConversationsEndpoint, roomConversationEndpoint, sendMessagEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, userRegistrationEndpoint } from '../../api/apiEndpoint';
 
 // Async function for checking user authentication
-export const checkUserAuthentication = createAsyncThunk('chat/authenticate', async () => {
-    const res = await fetch(authenticateUser, {
+export const authenticateUser = createAsyncThunk('chat/authenticateUser', async () => {
+    const res = await fetch(userAuthenticationEndpoint, {
         method: 'GET',
         credentials: 'include',
     });
     const data = await res.json();
     if (!data.success) {
-        throw new Error(data.error);
+        throw new Error(data.message);
     };
     return data.user;
 });
 
 // Async function for user login
-export const handleUserLogin = createAsyncThunk('chat/login', async (userData) => {
-    const res = await fetch(loginUser, {
+export const userLogin = createAsyncThunk('chat/login', async (userData) => {
+    const res = await fetch(userLoginEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -29,22 +29,18 @@ export const handleUserLogin = createAsyncThunk('chat/login', async (userData) =
     });
     const data = await res.json();
     if (!res.ok) {
-        if (res.status === 500) {
-            toast('Some error occured');
-        } else {
-            toast(data.error);
-        };
-        throw new Error(data.error);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
     };
-    toast('User login successful');
+    toast(data.message);
     return data.user;
 });
 
 // Async function for user registration
-export const handleUserRegistration = createAsyncThunk('chat/register', async (userData) => {
+export const userRegistration = createAsyncThunk('chat/register', async (userData) => {
     const date = new Date();
     const time_stamp = date.getTime();
-    const res = await fetch(registerUser, {
+    const res = await fetch(userRegistrationEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -54,39 +50,35 @@ export const handleUserRegistration = createAsyncThunk('chat/register', async (u
     });
     const data = await res.json();
     if (!res.ok) {
-        if (res.status === 500) {
-            toast('Some error occured');
-        } else {
-            toast(data.error);
-        };
-        throw new Error(data.error);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
     };
-    toast('User registration successful, redirecting to login page');
-    return data.message;
+    toast(data.message + ', redirecting to login page');
+    return;
 });
 
 // Getting all the users
 export const getUsers = createAsyncThunk('chat/getUsers', async () => {
-    const res = await fetch(getAllUser, {
+    const res = await fetch(getAllUsersEndpoint, {
         method: 'Get',
         credentials: 'include'
     });
     const data = await res.json();
     if (!res.ok) {
-        throw new Error(data.error);
+        throw new Error(data.message);
     };
     return data.users;
 });
 
 // Fetching user recent conversation with other user
 export const getRecentConversations = createAsyncThunk('chat/getRecentConversations', async () => {
-    const res = await fetch(recentConversations, {
+    const res = await fetch(recentConversationsEndpoint, {
         method: 'Get',
         credentials: 'include'
     });
     const data = await res.json();
     if (!res.ok) {
-        throw new Error(data.error);
+        throw new Error(data.message);
     };
     // Joining on those room where other user are already waiting
     const rooms = data.recentConversations.map(conversation => conversation.user.roomId);
@@ -96,13 +88,13 @@ export const getRecentConversations = createAsyncThunk('chat/getRecentConversati
 
 // Fetching user messages for a particular room
 export const getConversationByRoomId = createAsyncThunk('chat/getConversationByRoomId', async (roomId) => {
-    const res = await fetch(`${roomConversation}/${roomId}`, {
+    const res = await fetch(`${roomConversationEndpoint}/${roomId}`, {
         method: 'GET',
         credentials: 'include'
     });
     const data = await res.json();
     if (!res.ok) {
-        throw new Error(data.error);
+        throw new Error(data.message);
     };
     return { user: { ...data.user, roomId }, messages: data.messages };
 });
@@ -110,7 +102,7 @@ export const getConversationByRoomId = createAsyncThunk('chat/getConversationByR
 //Inittiating chat room
 const initiateChat = async (userId) => {
     try {
-        const res = await fetch(createRoom, {
+        const res = await fetch(createRoomEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -139,7 +131,7 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message
     };
     const date = new Date();
     const time_stamp = date.getTime();
-    const res = await fetch(`${sendMsg}/${roomId}/message`, {
+    const res = await fetch(`${sendMessagEndpoint}/${roomId}/message`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -149,7 +141,7 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message
     });
     const data = await res.json();
     if (!res.ok) {
-        throw new Error(data.error);
+        throw new Error(data.message);
     };
     // filtering current and other user
     const { users, message: receivedMessage, roomId: room } = data.conversation;
@@ -160,8 +152,8 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message
     return { user: { ...otherUser, roomId: room }, message: receivedMessage };
 });
 // updaing current user details based on user request
-export const updateUserDetails = createAsyncThunk('chat/updateUserDetails', async ({ inputValue, userId }) => {
-    const res = await fetch(`${updateUser}/${userId}`, {
+export const updateUser = createAsyncThunk('chat/updateUser', async ({ inputValue, userId }) => {
+    const res = await fetch(`${updateUserEndpoint}/${userId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -171,12 +163,8 @@ export const updateUserDetails = createAsyncThunk('chat/updateUserDetails', asyn
     });
     const data = await res.json();
     if (!res.ok) {
-        if (res.status === 500) {
-            toast('Some error occured');
-        } else {
-            toast(data.error);
-        };
-        throw new Error(data.error);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
     };
     toast(data.message);
     return data.user;
@@ -184,23 +172,22 @@ export const updateUserDetails = createAsyncThunk('chat/updateUserDetails', asyn
 
 // logging out user
 export const logoutUser = createAsyncThunk('chat/logout', async () => {
-    const res = await fetch(logout, {
+    const res = await fetch(logoutUserEndpoint, {
         method: 'GET',
         credentials: 'include',
     });
     const data = await res.json();
     if (!res.ok) {
-        toast('Some error occured');
-        console.log(res, data);
-        throw new Error(data.error);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
     };
     toast(data.message);
-    return data.message;
+    return;
 });
 
 // deleting account
 export const deleteUserAccount = createAsyncThunk('chat/deleteUserAccount', async ({ inputValue, userId }) => {
-    const res = await fetch(`${deleteUser}/${userId}`, {
+    const res = await fetch(`${deleteUserEndpoint}/${userId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -210,15 +197,30 @@ export const deleteUserAccount = createAsyncThunk('chat/deleteUserAccount', asyn
     });
     const data = await res.json();
     if (!res.ok) {
-        if (res.status === 500) {
-            toast('Some error occured');
-        } else {
-            toast(data.error);
-        };
-        throw new Error(data.error);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
     };
     toast(data.message);
     return;
+});
+
+// updating profile picture
+export const updateProfilePicture = createAsyncThunk('chat/updateProfilePicture', async (imageFile) => {
+    const formData = new FormData();
+    formData.append('profilePicture', imageFile);
+
+    const res = await fetch(updateProfilePicEndpoint, {
+        method: 'PUT',
+        credentials: 'include',
+        body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return data.user;
 });
 
 // Defining initial state
@@ -346,55 +348,51 @@ const chatSlice = createSlice({
     },
     extraReducers: builder => {
         // While checking user authentication
-        builder.addCase(checkUserAuthentication.pending, (state) => {
+        builder.addCase(authenticateUser.pending, (state) => {
             state.isLoading = true;
         });
-        builder.addCase(checkUserAuthentication.fulfilled, (state, action) => {
+        builder.addCase(authenticateUser.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isLoggedIn = true;
             state.currentUser = action.payload;
         });
-        builder.addCase(checkUserAuthentication.rejected, (state, action) => {
+        builder.addCase(authenticateUser.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = action.error.message;
         });
         // While user login
-        builder.addCase(handleUserLogin.pending, (state) => {
+        builder.addCase(userLogin.pending, (state) => {
             state.isLoading = true;
+            state.isError = null;
         });
-        builder.addCase(handleUserLogin.fulfilled, (state, action) => {
+        builder.addCase(userLogin.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isLoggedIn = true;
-            state.notification = 'User login successful';
-            state.isError = null;
             state.currentUser = action.payload;
         });
-        builder.addCase(handleUserLogin.rejected, (state, action) => {
+        builder.addCase(userLogin.rejected, (state, action) => {
             state.isLoading = false;
-            state.notification = action.error.message;
             state.isError = action.error.message;
         });
         // While user registration
-        builder.addCase(handleUserRegistration.pending, (state) => {
+        builder.addCase(userRegistration.pending, (state) => {
             state.isLoading = true;
-        });
-        builder.addCase(handleUserRegistration.fulfilled, (state) => {
-            state.isLoading = false;
-            state.notification = 'User registration successful, redirecting to login page';
             state.isError = null;
         });
-        builder.addCase(handleUserRegistration.rejected, (state, action) => {
+        builder.addCase(userRegistration.fulfilled, (state) => {
             state.isLoading = false;
-            state.notification = action.error.message;
+        });
+        builder.addCase(userRegistration.rejected, (state, action) => {
+            state.isLoading = false;
             state.isError = action.error.message;
         });
         // While fetching all user
         builder.addCase(getUsers.pending, (state) => {
             state.isLoading = true;
+            state.isError = null;
         });
         builder.addCase(getUsers.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isError = null;
             const users = action.payload.filter(user => user._id !== state.currentUser._id);
             state.users = users;
             state.tempUsers = users;
@@ -406,10 +404,10 @@ const chatSlice = createSlice({
         // Getting recent conversation
         builder.addCase(getRecentConversations.pending, (state) => {
             state.isLoading = true;
+            state.isError = null;
         });
         builder.addCase(getRecentConversations.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isError = null;
             state.recentConversations = action.payload;
             state.tempRecentConversations = action.payload;
         });
@@ -420,10 +418,10 @@ const chatSlice = createSlice({
         // Getting conversation by roomId
         builder.addCase(getConversationByRoomId.pending, (state) => {
             state.isLoading = true;
+            state.isError = null;
         });
         builder.addCase(getConversationByRoomId.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isError = null;
             state.roomConversation = action.payload;
             state.allRoomConversations = [...state.allRoomConversations, action.payload];
         });
@@ -434,10 +432,10 @@ const chatSlice = createSlice({
         // send message and update conversation
         builder.addCase(sendMessage.pending, (state) => {
             state.isLoading = true;
+            state.isError = null;
         });
         builder.addCase(sendMessage.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isError = null;
 
             const { user, message } = action.payload;
             // updating recent conversation
@@ -464,35 +462,53 @@ const chatSlice = createSlice({
             state.isError = action.error.message;
         });
         // updating current user details
-        builder.addCase(updateUserDetails.pending, (state) => {
+        builder.addCase(updateUser.pending, (state) => {
+            state.isLoading = true;
             state.isError = null;
         });
-        builder.addCase(updateUserDetails.fulfilled, (state, action) => {
-            state.isError = null;
+        builder.addCase(updateUser.fulfilled, (state, action) => {
+            state.isLoading = false;
             state.currentUser = action.payload;
         });
-        builder.addCase(updateUserDetails.rejected, (state, action) => {
+        builder.addCase(updateUser.rejected, (state, action) => {
+            state.isLoading = false;
             state.isError = action.error.message;
-            state.notification = action.error.message;
         });
         // logging out user
         builder.addCase(logoutUser.pending, (state) => {
+            state.isLoading = true;
             state.isError = null;
         });
         builder.addCase(logoutUser.fulfilled, () => {
             return initialState;
         });
         builder.addCase(logoutUser.rejected, (state, action) => {
+            state.isLoading = false;
             state.isError = action.error.message;
         });
         // logging out user
         builder.addCase(deleteUserAccount.pending, (state) => {
+            state.isLoading = true;
             state.isError = null;
         });
         builder.addCase(deleteUserAccount.fulfilled, () => {
             return initialState;
         });
         builder.addCase(deleteUserAccount.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // updating profile picture
+        builder.addCase(updateProfilePicture.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(updateProfilePicture.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.currentUser = action.payload;
+        });
+        builder.addCase(updateProfilePicture.rejected, (state, action) => {
+            state.isLoading = false;
             state.isError = action.error.message;
         });
     }
