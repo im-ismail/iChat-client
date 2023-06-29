@@ -4,7 +4,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { emitTyping } from '../services/socket';
 import { sendMessage } from '../features/chats/chatSlice';
 
-const SendMessage = ({ user, setSubcribedRooms }) => {
+const SendMessage = ({ user, setJoinedRooms }) => {
 
     const { _id: otherUserId, roomId, name } = user;
     const [message, setMessage] = useState('');
@@ -53,7 +53,7 @@ const SendMessage = ({ user, setSubcribedRooms }) => {
                 setMessage('');
                 // adding this newly created roomId to subscribedRoom to avoid any conflict
                 if (!roomId) {
-                    setSubcribedRooms(prev => prev ? [...prev, data.user.roomId] : [data.user.roomId]);
+                    setJoinedRooms(prev => prev ? [...prev, data.user.roomId] : [data.user.roomId]);
                 };
             } catch (error) {
                 console.log(error);

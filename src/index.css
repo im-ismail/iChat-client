@@ -309,6 +309,7 @@ select {
 }
 
 .profile-page .profile-pic {
+  position: relative;
   cursor: pointer;
 }
 
@@ -321,9 +322,9 @@ select {
 .profile-page .user-profile .edit-pen {
   font-size: 1.4rem;
   color: rgb(86, 86, 193);
-  position: relative;
-  top: -4px;
-  right: 24px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
 .profile-page .user-profile .edit-pen:hover {
@@ -413,6 +414,7 @@ select {
   top: 0;
   left: 0; */
   padding: 5px 10px;
+  border-bottom: 1px solid rgb(228, 225, 225);
 }
 
 .go-back {
@@ -431,6 +433,41 @@ select {
 
 /* Styling chat screen navigation end */
 
+/* styling chat partner profile page */
+.chat-partner-profile-page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60vw;
+  height: 100vh;
+  background-color: #e2fffe;
+  z-index: 1;
+  display: none;
+}
+
+.chat-partner-profile-page .profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-partner-profile-page .profile-pic img {
+  width: 100px;
+  height: 100px;
+  margin-top: 20px;
+  border-radius: 50%;
+}
+
+.chat-partner-profile-page .profile .details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* styling chat partner profile end */
+
 /* Styling chat screen send message start */
 .send-message-section {
   background-color: #d9eceb;
@@ -438,9 +475,9 @@ select {
   align-items: center;
   gap: 1rem;
   padding: 5px 30px;
-  /* position: sticky;
+  position: sticky;
   left: 0;
-  bottom: 0; */
+  bottom: 0;
   height: 50px;
   width: 100%;
 }
@@ -511,7 +548,7 @@ textarea:focus {
 /* Styling chat screen send message end */
 
 /* Styling messages section */
-.chat-screen {
+.messages-container {
   width: 100%;
   height: calc(100% - (50px + 50px));
   background-color: #e9edef;

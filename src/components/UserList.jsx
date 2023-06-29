@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
-// import '../styles/userList.css';
 import Loading from './Loading';
-import { filterUsersList, setNewChat } from '../features/chats/chatSlice';
+import { filterUsersList, setNewChat, setRoomConversation } from '../features/chats/chatSlice';
 import { serverUrl } from '../api/apiEndpoint';
 
 const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
@@ -30,6 +29,7 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
             const { _id, roomId } = matchedConversation.user;
             fetchRoomConversation(roomId, _id);
         } else {
+            dispatch(setRoomConversation(null));
             dispatch(setNewChat(user));
             // for small screen to show chatpage for new chat
             makeItResponsive()

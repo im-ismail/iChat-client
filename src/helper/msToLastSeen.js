@@ -1,41 +1,4 @@
-const active = (ms) => {
-    const cms = new Date().getTime();
-    const diffInSec = Math.floor((cms - ms) / 1000);
-
-    const minute = 60;
-    const hour = minute * 60;
-    const day = hour * 24;
-    const week = day * 7;
-
-    const diffInWeeks = Math.floor(diffInSec / week);
-    const diffInDays = Math.floor(diffInSec / day);
-    const diffInHours = Math.floor(diffInSec / hour);
-    const diffInMinutes = Math.floor(diffInSec / minute);
-
-    // Define the text format for each unit
-    const weekText = `${diffInWeeks}w`;
-    const dayText = `${diffInDays}d`;
-    const hourText = `${diffInHours}h`;
-    const minuteText = `${diffInMinutes}m`;
-    const secondText = `${diffInSec}s`;
-
-    // Choose the appropriate text based on the elapsed time
-    let lastSeenText = '';
-    if (diffInWeeks > 0) {
-        lastSeenText = weekText;
-    } else if (diffInDays > 0) {
-        lastSeenText = dayText;
-    } else if (diffInHours > 0) {
-        lastSeenText = hourText;
-    } else if (diffInMinutes > 0) {
-        lastSeenText = minuteText;
-    } else {
-        lastSeenText = secondText;
-    };
-
-    return `Active ${lastSeenText} ago`;
-};
-
+// function to find out user last seen
 const lastSeen = (ms) => {
     const activeOn = new Date(ms);
     let date = activeOn.getDate();

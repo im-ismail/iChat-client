@@ -1,5 +1,4 @@
 import React from 'react';
-// import '../styles/chatList.css';
 import msToTime from '../helper/msToTime';
 import { useSelector } from 'react-redux';
 import Loading from './Loading';

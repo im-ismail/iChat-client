@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-// import '../styles/home.css';
 import UserList from '../components/UserList';
 import { filterChatList, getRecentConversations, getUsers, getConversationByRoomId, setRoomConversation, setNewChat } from '../features/chats/chatSlice';
 import ChatList from '../components/ChatList';
@@ -19,7 +18,7 @@ const Home = () => {
     const mainPageRef = useRef();
     const chatPageRef = useRef();
     const dispatch = useDispatch()
-    const [subscribedRooms, setSubcribedRooms] = useState(null);
+    const [joinedRooms, setJoinedRooms] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -96,18 +95,18 @@ const Home = () => {
             dispatch(setNewChat(null));
         };
         checkRoomConversation(roomId);
-        // Preventing user from joining the same room multiple time
-        if (subscribedRooms) {
-            const existingRoom = subscribedRooms.filter((room) => {
+        // Preventing user from sending join request for previously joined room
+        if (joinedRooms) {
+            const existingRoom = joinedRooms.filter((room) => {
                 return room === roomId;
             })[0];
             if (!existingRoom) {
                 joinRoom(roomId, otherUserId);
-                setSubcribedRooms([...subscribedRooms, roomId]);
+                setJoinedRooms([...joinedRooms, roomId]);
             };
         } else {
             joinRoom(roomId, otherUserId);
-            setSubcribedRooms([roomId]);
+            setJoinedRooms([roomId]);
         };
     };
 
@@ -138,11 +137,21 @@ const Home = () => {
                     <input type="search" name="listSearch" className="list-search" placeholder="Search or start a new chat" onChange={handleInputChange} />
                     <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
-                <UserList userListRef={userListRef} fetchRoomConversation={fetchRoomConversation} makeItResponsive={makeItResponsive} />
+                <UserList
+                    userListRef={userListRef}
+                    fetchRoomConversation={fetchRoomConversation}
+                    makeItResponsive={makeItResponsive}
+                />
                 {currentUser && <Profile profileRef={profileRef} />}
                 <ChatList fetchRoomConversation={fetchRoomConversation} />
             </div>
-            <ChatPage loading={loading} error={error} setSubcribedRooms={setSubcribedRooms} chatPageRef={chatPageRef} makeItResponsive={makeItResponsive} />
+            <ChatPage
+                loading={loading}
+                error={error}
+                setJoinedRooms={setJoinedRooms}
+                chatPageRef={chatPageRef}
+                makeItResponsive={makeItResponsive}
+            />
         </div>
     )
 }
