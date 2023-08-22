@@ -38,15 +38,13 @@ export const userLogin = createAsyncThunk('chat/login', async (userData) => {
 
 // Async function for user registration
 export const userRegistration = createAsyncThunk('chat/register', async (userData) => {
-    const date = new Date();
-    const time_stamp = date.getTime();
     const res = await fetch(userRegistrationEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ ...userData, time_stamp })
+        body: JSON.stringify(userData)
     });
     const data = await res.json();
     if (!res.ok) {
@@ -129,15 +127,13 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message
     if (newChat) {
         dispatch(setNewChat(null));
     };
-    const date = new Date();
-    const time_stamp = date.getTime();
     const res = await fetch(`${sendMessagEndpoint}/${roomId}/message`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ message, time_stamp, otherUserId }),
+        body: JSON.stringify({ message }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -345,6 +341,92 @@ const chatSlice = createSlice({
             state.recentConversations = updatedRecentConversations;
             state.roomConversation = state.roomConversation && state.roomConversation.user.roomId === roomId ? { ...state.roomConversation, user: { ...state.roomConversation.user, typing } } : state.roomConversation;
         },
+        markMessagesAsRead: (state, action) => {
+            const { updatedMessages, roomId, otherUserId, unreadMessagesCount } = action.payload;
+            // first updating recent conversation
+            const updateConversationMessages = (conversations) => {
+                return conversations.map(conversation => {
+                    const { user, message } = conversation;
+                    if (user.roomId === roomId) {
+                        const updatedMessage = updatedMessages.find(msg => msg._id === message._id);
+                        if (updatedMessage) {
+                            return { user, message: { ...message, read: updatedMessage.read, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
+                        } else {
+                            return conversation;
+                        }
+                    } else {
+                        return conversation;
+                    };
+                });
+            };
+
+            state.recentConversations = updateConversationMessages(state.recentConversations);
+            state.tempRecentConversations = updateConversationMessages(state.tempRecentConversations);
+
+            // updating roomConversation and allRoomConversation
+            const messages = state.roomConversation?.user.roomId === roomId ? state.roomConversation?.messages : state.allRoomConversations?.find(conversation => conversation.user.roomId === roomId)?.messages ?? null;
+            if (!messages) return;
+            const newUpdatedMessages = messages.map((message) => {
+                const updatedMessage = updatedMessages.find(updatedMsg => updatedMsg._id === message._id);
+                if (updatedMessage) {
+                    return { ...message, read: updatedMessage.read };
+                } else {
+                    return message;
+                };
+            });
+
+            state.roomConversation = state.roomConversation?.user.roomId === roomId ? { ...state.roomConversation, messages: newUpdatedMessages } : state.roomConversation;
+            state.allRoomConversations = state.allRoomConversations?.map(conversation => {
+                if (conversation.user.roomId === roomId) {
+                    return { ...conversation, messages: newUpdatedMessages };
+                } else {
+                    return conversation;
+                };
+            });
+        },
+        markMessagesAsDelivered: (state, action) => {
+            const { updatedMessages, roomId, otherUserId, unreadMessagesCount } = action.payload;
+            // first updating recent conversation
+            const updateConversationMessages = (conversations) => {
+                return conversations.map(conversation => {
+                    const { user, message } = conversation;
+                    if (user.roomId === roomId) {
+                        const updatedMessage = updatedMessages.find(msg => msg._id === message._id);
+                        if (updatedMessage) {
+                            return { user, message: { ...message, delivered: updatedMessage.delivered, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
+                        } else {
+                            return conversation;
+                        }
+                    } else {
+                        return conversation;
+                    };
+                });;
+            };
+
+            state.recentConversations = updateConversationMessages(state.recentConversations);
+            state.tempRecentConversations = updateConversationMessages(state.tempRecentConversations);
+
+            // updating roomConversation and allRoomConversation
+            const messages = state.roomConversation?.user.roomId === roomId ? state.roomConversation?.messages : state.allRoomConversations?.find(conversation => conversation.user.roomId === roomId)?.messages ?? null;
+            if (!messages) return;
+            const newUpdatedMessages = messages.map((message) => {
+                const updatedMessage = updatedMessages.find(updatedMsg => updatedMsg._id === message._id);
+                if (updatedMessage) {
+                    return { ...message, delivered: updatedMessage.delivered };
+                } else {
+                    return message;
+                };
+            });
+
+            state.roomConversation = state.roomConversation?.user.roomId === roomId ? { ...state.roomConversation, messages: newUpdatedMessages } : state.roomConversation;
+            state.allRoomConversations = state.allRoomConversations?.map(conversation => {
+                if (conversation.user.roomId === roomId) {
+                    return { ...conversation, messages: newUpdatedMessages };
+                } else {
+                    return conversation;
+                };
+            });
+        },
     },
     extraReducers: builder => {
         // While checking user authentication
@@ -514,5 +596,5 @@ const chatSlice = createSlice({
     }
 });
 
-export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus } = chatSlice.actions;
+export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, markMessagesAsRead, markMessagesAsDelivered } = chatSlice.actions;
 export default chatSlice.reducer;

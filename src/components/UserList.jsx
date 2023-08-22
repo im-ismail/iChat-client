@@ -55,7 +55,7 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
                     <div className="user-list">
                         {
                             users.map((user, index) => {
-                                const { name, number, image } = user;
+                                const { name, number, image, online } = user;
                                 let num = number.toString();
                                 num = num.slice(0, 2) + '****' + num.slice(6);
                                 return <div className="user" key={index} onClick={() => handleUserListClick(user)}>
@@ -63,7 +63,7 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
                                         <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
                                     </div>
                                     <div>
-                                        <h3>{name}</h3>
+                                        <h3 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h3>
                                         <p>{num}</p>
                                     </div>
                                 </div>

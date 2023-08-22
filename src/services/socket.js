@@ -1,4 +1,4 @@
-import { updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
+import { markMessagesAsDelivered, markMessagesAsRead, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
 
 let socket = null;
 let dispatch = null;
@@ -14,8 +14,7 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
         console.log(`⚡: ${socket.id} connected`);
     });
     // receiving messages
-    socket.on('new-message', (conversation, callback) => {
-        callback({ message: 'message received successfully' });
+    socket.on('new-message', (conversation) => {
         dispatch(updateReceivedConversation(conversation));
     });
     // receiving updated user details
@@ -23,13 +22,20 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
         dispatch(updateUserStatus(updatedUser));
     });
     // receiving typing event
-    socket.on('typing', (roomId, callback) => {
-        callback('done')
+    socket.on('typing', (roomId) => {
         clearTimeout(timeOut);
         dispatch(updateTypingStatus({ roomId, typing: true }));
         timeOut = setTimeout(() => {
             dispatch(updateTypingStatus({ roomId, typing: false }));
         }, 2000);
+    });
+    // receiving event to mark messages as read
+    socket.on('mark-read', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
+        dispatch(markMessagesAsRead({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
+    });
+
+    socket.on('mark-delivered', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
+        dispatch(markMessagesAsDelivered({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
     });
 };
 // This will be called for the first time when user login and will check for available room to connect where other user is already on that room
@@ -50,6 +56,15 @@ const emitMessage = (message) => {
 const emitTyping = (roomId) => {
     socket.emit('typing', roomId);
 };
+// emitting event to mark messages as read
+const markAsRead = (ids, roomId, otherUserId) => {
+    socket.emit('mark-read', { ids, roomId, otherUserId });
+};
 
-export { checkRooms, joinRoom, emitMessage, emitTyping };
+// emitting event to mark messages as delivered
+const markAsDelivered = (roomId, otherUserId) => {
+    socket.emit('mark-delivered', { roomId, otherUserId });
+};
+
+export { checkRooms, joinRoom, emitMessage, emitTyping, markAsRead, markAsDelivered };
 export default configureSocket;
