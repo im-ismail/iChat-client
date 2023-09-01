@@ -5,10 +5,10 @@ import { deleteUserAccount } from '../features/chats/chatSlice';
 const Delete = ({ deletePageRef, userId }) => {
 
     const [inputValue, setInputValue] = useState({
-        number: '',
+        email: '',
         password: ''
     });
-    const { number, password } = inputValue;
+    const { email, password } = inputValue;
     const dispatch = useDispatch();
     const [isIdle, setIsIdle] = useState(false);
 
@@ -35,7 +35,7 @@ const Delete = ({ deletePageRef, userId }) => {
         const deletePage = deletePageRef.current;
         deletePage.style.display = 'none';
         setInputValue({
-            number: '',
+            email: '',
             password: ''
         });
     };
@@ -48,7 +48,7 @@ const Delete = ({ deletePageRef, userId }) => {
             </div>
             <form className='login-form' onSubmit={deleteAccount}>
                 <div className="input">
-                    <input type="number" name='number' placeholder='Enter your number' required onChange={handleChange} value={number} />
+                    <input type="email" name='email' placeholder='Enter your email address' required onChange={handleChange} value={email} />
                 </div>
                 <div className="input">
                     <input type="password" name='password' placeholder='Enter your password' required onChange={handleChange} value={password} />

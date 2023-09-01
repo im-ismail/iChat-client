@@ -7,10 +7,10 @@ const Login = () => {
 
     const { isLoggedIn } = useSelector(state => state.chat);
     const [userData, setUserData] = useState({
-        number: '',
+        email: '',
         password: ''
     });
-    const [isIdle, setIsIdle] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -27,16 +27,16 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            setIsIdle(true);
+            setIsLoading(true);
             await dispatch(userLogin(userData)).unwrap();
             setUserData({
-                number: '',
+                email: '',
                 password: ''
             });
         } catch (error) {
             console.log(error);
         } finally {
-            setIsIdle(false);
+            setIsLoading(false);
         };
     };
 
@@ -48,13 +48,13 @@ const Login = () => {
                     <h1 className="heading">Login to your iChat account</h1>
                     <form id="login-form" onSubmit={handleSubmit}>
                         <div className="input">
-                            <input id="number" type="number" name="number" placeholder="Mobile number" required onChange={handleChange} value={userData.number} />
+                            <input id="email" type="email" name="email" placeholder="Email address" required onChange={handleChange} value={userData.email} />
                         </div>
                         <div className="input">
-                            <input id="password" type="password" name="password" placeholder="Password" required onChange={handleChange} value={userData.password} />
+                            <input id="password" type="password" name="password" placeholder="Password" required minLength={6} onChange={handleChange} value={userData.password} />
                         </div>
                         <div className="button">
-                            <button type="submit" disabled={isIdle} className={isIdle ? 'disable' : ''}>Log In</button>
+                            <button type="submit" disabled={isLoading} className={isLoading ? 'disable' : ''}>{isLoading ? 'Logging in...' : 'Log In'}</button>
                         </div>
                     </form>
                     <div className="link">

@@ -1,8 +1,10 @@
-const serverUrl = 'http://localhost:5000';
+const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 // User API endpoints
 const userAPI = {
-    userRegistrationEndpoint: `${serverUrl}/users/register`,
+    userRegistrationEndpoint: `${serverUrl}/users/start-registration`,
+    otpVerificationForRegistrationEndpoint: `${serverUrl}/users/complete-registration`,
+    resendOtpForRegistrationEndpoint: `${serverUrl}/users/register/resend-otp`,
     userLoginEndpoint: `${serverUrl}/users/login`,
     userAuthenticationEndpoint: `${serverUrl}/users/authenticate`,
     getAllUsersEndpoint: `${serverUrl}/users`,

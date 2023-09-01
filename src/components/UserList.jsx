@@ -23,7 +23,7 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
     // handling list click
     const handleUserListClick = (user) => {
         const matchedConversation = recentConversations.filter((conversation) => {
-            return conversation.user.number === user.number;
+            return conversation.user.email === user.email;
         })[0];
         if (matchedConversation) {
             const { _id, roomId } = matchedConversation.user;
@@ -48,23 +48,23 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
                         <i className="fa-regular fa-circle-xmark" onClick={closeUserList}></i>
                     </div>
                     <div className="list-search">
-                        <input type="search" name="listSearch" placeholder="Search by name or number" onChange={handleInputChange} />
+                        <input type="search" name="listSearch" placeholder="Search by name or email" onChange={handleInputChange} />
                         <i className="fa-solid fa-magnifying-glass"></i>
                     </div>
                 </div>
                     <div className="user-list">
                         {
                             users.map((user, index) => {
-                                const { name, number, image, online } = user;
-                                let num = number.toString();
-                                num = num.slice(0, 2) + '****' + num.slice(6);
+                                const { name, email, image, online } = user;
+                                const emailParts = email.split('@');
+                                const showEmail = emailParts[0].slice(0, Math.floor(emailParts[0].length / 2)) + '*****@' + emailParts[1];
                                 return <div className="user" key={index} onClick={() => handleUserListClick(user)}>
                                     <div>
                                         <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
                                     </div>
                                     <div>
                                         <h3 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h3>
-                                        <p>{num}</p>
+                                        <p>{showEmail}</p>
                                     </div>
                                 </div>
                             })

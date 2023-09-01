@@ -10,10 +10,10 @@ import io from 'socket.io-client';
 import configureSocket from "./services/socket";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { serverUrl } from "./api/apiEndpoint";
 
 function App() {
 
-  const API = 'http://localhost:5000';
   const { isLoggedIn, currentUser, notification } = useSelector(state => state.chat);
 
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ function App() {
     let socket = null;
     if (isLoggedIn) {
       // Connect to the server using Socket.io
-      socket = io.connect(API);
+      socket = io.connect(serverUrl);
       // Calling the socket module
       configureSocket(socket, currentUser._id, dispatch);
     };

@@ -48,9 +48,7 @@ const joinRoom = (roomId, otherUserId) => {
 };
 // For sending message
 const emitMessage = (message) => {
-    socket.emit('new-message', message, (response) => {
-        console.log('callback', response);
-    });
+    socket.emit('new-message', message);
 };
 // sending typing alert
 const emitTyping = (roomId) => {

@@ -6,13 +6,13 @@ const Edit = ({ editPageRef, updateType, userId }) => {
 
     const [inputValue, setInputValue] = useState({
         name: '',
-        oldNumber: '',
-        newNumber: '',
+        oldEmail: '',
+        newEmail: '',
         oldPassword: '',
         newPassword: '',
         password: ''
     });
-    const { name, oldNumber, newNumber, oldPassword, newPassword, password } = inputValue;
+    const { name, oldEmail, newEmail, oldPassword, newPassword, password } = inputValue;
     const dispatch = useDispatch();
     const [isIdle, setIsIdle] = useState(false);
 
@@ -41,8 +41,8 @@ const Edit = ({ editPageRef, updateType, userId }) => {
         editPage.style.display = 'none';
         setInputValue({
             name: '',
-            oldNumber: '',
-            newNumber: '',
+            oldEmail: '',
+            newEmail: '',
             oldPassword: '',
             newPassword: '',
             password: ''
@@ -53,18 +53,18 @@ const Edit = ({ editPageRef, updateType, userId }) => {
         <div className="edit-page" ref={editPageRef}>
             <div className='navigation'>
                 <span className="go-back" onClick={closeEditPage}>🔙</span>
-                <span>{updateType === 'name' ? 'Edit name' : updateType === 'number' ? 'Change number' : 'Change password'}</span>
+                <span>{updateType === 'name' ? 'Edit name' : updateType === 'email' ? 'Change email address' : 'Change password'}</span>
             </div>
             <form onSubmit={handleProfileUpdate}>
                 {updateType === 'name' && <div className="input">
                     <input type="text" name='name' placeholder='Enter your name' required onChange={handleChange} value={name} />
                 </div>}
-                {updateType === 'number' && <>
+                {updateType === 'email' && <>
                     <div className="input">
-                        <input type="number" name='oldNumber' placeholder='Enter old number' required onChange={handleChange} value={oldNumber} />
+                        <input type="email" name='oldEmail' placeholder='Enter old email address' required onChange={handleChange} value={oldEmail} />
                     </div>
                     <div className="input">
-                        <input type="number" name='newNumber' placeholder='Enter new number' required onChange={handleChange} value={newNumber} />
+                        <input type="email" name='newEmail' placeholder='Enter new email address' required onChange={handleChange} value={newEmail} />
                     </div>
                 </>}
                 {updateType === 'password' && <><div className="input">

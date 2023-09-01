@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
 import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
-import { createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, recentConversationsEndpoint, roomConversationEndpoint, sendMessagEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, userRegistrationEndpoint } from '../../api/apiEndpoint';
+import { createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, otpVerificationForRegistrationEndpoint, recentConversationsEndpoint, resendOtpForRegistrationEndpoint, roomConversationEndpoint, sendMessagEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, userRegistrationEndpoint } from '../../api/apiEndpoint';
 
 // Async function for checking user authentication
 export const authenticateUser = createAsyncThunk('chat/authenticateUser', async () => {
@@ -37,13 +37,30 @@ export const userLogin = createAsyncThunk('chat/login', async (userData) => {
 });
 
 // Async function for user registration
-export const userRegistration = createAsyncThunk('chat/register', async (userData) => {
+export const userRegistration = createAsyncThunk('chat/registerSendOtp', async (userData) => {
     const res = await fetch(userRegistrationEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include',
+        body: JSON.stringify(userData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 100 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return;
+});
+
+// Async function for otp verification while registerig
+export const completeRegistration = createAsyncThunk('chat/registerVerifyOtp', async (userData) => {
+    const res = await fetch(otpVerificationForRegistrationEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(userData)
     });
     const data = await res.json();
@@ -52,6 +69,24 @@ export const userRegistration = createAsyncThunk('chat/register', async (userDat
         throw new Error(data.message);
     };
     toast(data.message + ', redirecting to login page');
+    return;
+});
+
+// Async function for user registration
+export const resendOtpForRegistration = createAsyncThunk('chat/registerVerifyOtp', async (userData) => {
+    const res = await fetch(resendOtpForRegistrationEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
     return;
 });
 
@@ -512,7 +547,10 @@ const chatSlice = createSlice({
             state.isError = action.error.message;
         });
         // send message and update conversation
-        builder.addCase(sendMessage.pending, (state) => {
+        builder.addCase(sendMessage.pending, (state, action) => {
+            console.log("🚀 ~ file: chatSlice.js:516 ~ action:", action.meta)
+            console.log("🚀 ~ file: chatSlice.js:517 ~ action:", action.payload)
+            console.log("🚀 ~ file: chatSlice.js:518 ~ action:", action.type)
             state.isLoading = true;
             state.isError = null;
         });

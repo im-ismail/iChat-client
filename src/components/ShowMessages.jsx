@@ -11,7 +11,7 @@ const ShowMessages = ({ roomConversation }) => {
     const { _id: otherUserId, roomId } = user;
     let initialDate = '01/01/1970';
 
-    // handling message scroll
+    // handling message scroll to mark them as read
     const handleMessageScroll = () => {
         const container = messagesRef.current;
         if (!container) return;
@@ -39,13 +39,7 @@ const ShowMessages = ({ roomConversation }) => {
         };
     };
 
-    // Scrolling the page to the bottom of the chat for first time and adding listener on message scroll
-    useEffect(() => {
-        const container = messagesRef.current;
-        container.scrollTop = container.scrollHeight - container.clientHeight;
-    }, []);
-
-    // Scrolling to the bottom for new chat and for re opened chat it checks if the user was already at the bottom of the chat before the new message arrived and scrolls to the bottom only in that case.
+    // setting scroll behaviour of chat page
     useEffect(() => {
         const container = messagesRef.current;
         // adding scroll listener to message container with messages dependency to access updated messages inside from handleMessagesScroll
@@ -54,11 +48,37 @@ const ShowMessages = ({ roomConversation }) => {
         if (container.scrollHeight <= container.clientHeight) {
             handleMessageScroll();
         };
+
+        // finding last mesage from messages array
+        const lastMessage = messages[messages.length - 1];
+        // checking if user already scrolled to bottom before arriving new message
         const isScrolledToBottom = container.scrollHeight - container.clientHeight - container.lastChild.clientHeight <= container.scrollTop + 1;
-        if (currentRoom && currentRoom !== roomId) {
+        // scrolling to bottom incase of isScrolledToBottom is true or if last message was sent by user
+        if (isScrolledToBottom || lastMessage.sentBy._id !== otherUserId) {
+            console.log('istb', isScrolledToBottom);
+            console.log('first');
             container.scrollTop = container.scrollHeight - container.clientHeight;
-        } else if (isScrolledToBottom) {
-            container.scrollTop = container.scrollHeight - container.clientHeight;
+        } else {
+            // scrolling to bottom if height of unreadMessages not more than half of container clientHeight otherwise scrolling accordingly
+            const unreadMessages = messages.filter(message => {
+                return !message.read.status && message.sentBy._id === otherUserId;
+            });
+            let unreadMessagesHeight = 0;
+            if (unreadMessages.length) {
+                unreadMessages.forEach(message => {
+                    const messageRef = messageRefs.current[message._id];
+                    unreadMessagesHeight += messageRef.clientHeight;
+                });
+            };
+            const containerHeight = container.clientHeight;
+            if (unreadMessagesHeight > containerHeight / 2 && (!currentRoom || currentRoom !== roomId)) {
+                console.log('matched');
+                console.log('umh', unreadMessagesHeight);
+                container.scrollTop = container.scrollHeight - unreadMessagesHeight - (containerHeight / 2);
+            } else if (!currentRoom || currentRoom !== roomId) {
+                console.log('second');
+                container.scrollTop = container.scrollHeight - container.clientHeight;
+            };
         };
         setCurrentRoom(roomId);
         // cleaning up event listener whenever messages dependency changes
@@ -88,7 +108,7 @@ const ShowMessages = ({ roomConversation }) => {
 
                     if (initialDate !== dayAndDate) {
                         initialDate = dayAndDate;
-                        return <div key={index} ref={(ref) => (messageRefs.current[messageId] = ref)}>
+                        return <div key={index} ref={(ref) => (messageRefs.current[messageId] = ref)} className='first-message'>
                             <div className="show-date">
                                 <p>{result === 'today' ? 'Today' : result === 'yesterday' ? 'Yesterday' : dayAndDate}</p>
                             </div>

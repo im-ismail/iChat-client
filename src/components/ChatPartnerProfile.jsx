@@ -4,7 +4,7 @@ import msToLastSeen from '../helper/msToLastSeen';
 
 const ChatPartnerProfile = ({ user, profileRef }) => {
 
-    const { name, number, image, online, lastSeen, typing } = user;
+    const { name, email, image, online, lastSeen, typing } = user;
 
     // showing chat partner profile page
     const closeChatPartnerProfile = () => {
@@ -23,7 +23,7 @@ const ChatPartnerProfile = ({ user, profileRef }) => {
                     <img src={`${serverUrl}/${image}`} alt={name} />
                 </div>
                 <div className="details">
-                    <p>{number}</p>
+                    <p>{email}</p>
                     <p className="last-seen">{typing ? 'typing...' : online ? 'Online' : msToLastSeen(lastSeen)}</p>
                 </div>
             </div>

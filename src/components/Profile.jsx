@@ -8,7 +8,7 @@ import { serverUrl } from '../api/apiEndpoint';
 
 const Profile = ({ profileRef }) => {
 
-    const { _id, name, number, image } = useSelector(state => state.chat.currentUser);
+    const { _id, name, email, image } = useSelector(state => state.chat.currentUser);
     const [updateType, setUpdateType] = useState(null);
     const editPageRef = useRef();
     const deletePageRef = useRef();
@@ -56,13 +56,13 @@ const Profile = ({ profileRef }) => {
                     </div>
                     <div>
                         <h3>{name}</h3>
-                        <p>{number}</p>
+                        <p>{email}</p>
                     </div>
                 </div>
                 <hr />
                 <p className='list' onClick={() => showEditPage('name')}>Update Name</p>
                 <p className='list' onClick={() => showEditPage('password')}>Change Password</p>
-                <p className='list' onClick={() => showEditPage('number')}>Change Number</p>
+                <p className='list' onClick={() => showEditPage('email')}>Change Email</p>
                 <p className='list' style={{ color: 'red' }} onClick={showDeletePage}>Delete Account</p>
                 <p className='list' style={{ color: 'tomato' }} onClick={handleLogout}>Logout</p>
             </div>
