@@ -109,7 +109,8 @@ const ResetPassword = () => {
                     {isOtpGenerated && !isVerified &&
                         <div className='resend-otp'>
                             <span>OTP not received yet?</span> {isOtpRegenerating ? <span>Sending...</span> : showResendButton ? <span className='resend' onClick={reGenerateOtp}>Resend OTP</span> : <span>{Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}</span>}
-                        </div>}
+                        </div>
+                    }
                     <div className="link">
                         <Link to={'/login'} className="link">Enter password to login</Link>
                     </div>

@@ -11,7 +11,7 @@ const ChatList = ({ fetchRoomConversation, showUserList }) => {
 
     useEffect(() => {
         if (recentConversations?.length) {
-            recentConversations.map(conversation => {
+            recentConversations.forEach(conversation => {
                 const { user, message } = conversation;
                 const { _id, roomId } = user;
                 const { sentBy, delivered } = message;

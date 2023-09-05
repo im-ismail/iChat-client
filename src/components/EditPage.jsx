@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../features/chats/chatSlice';
+import { changeUserEmail, sendOtpForEmailChange, updateUser } from '../features/chats/chatSlice';
 
 const Edit = ({ editPageRef, updateType, userId }) => {
 
@@ -10,11 +10,16 @@ const Edit = ({ editPageRef, updateType, userId }) => {
         newEmail: '',
         oldPassword: '',
         newPassword: '',
-        password: ''
+        password: '',
+        otp: ''
     });
-    const { name, oldEmail, newEmail, oldPassword, newPassword, password } = inputValue;
+    const { name, oldEmail, newEmail, oldPassword, newPassword, password, otp } = inputValue;
     const dispatch = useDispatch();
-    const [isIdle, setIsIdle] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isOtpGenerated, setIsOtpGenerated] = useState(false);
+    const [showResendButton, setShowResendButton] = useState(true);
+    const [isOtpRegenerating, setIsOtpRegenerating] = useState(false);
+    const [countdown, setCountdown] = useState(120);
 
     // handling onChange event and setting input value to the state
     const handleChange = (e) => {
@@ -25,13 +30,48 @@ const Edit = ({ editPageRef, updateType, userId }) => {
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
         try {
-            setIsIdle(true);
-            await dispatch(updateUser({ inputValue, userId })).unwrap();
-            closeEditPage();
+            setIsLoading(true);
+            if (updateType === 'email') {
+                if (!isOtpGenerated) {
+                    await dispatch(sendOtpForEmailChange({ inputValue, userId })).unwrap();
+                    setIsOtpGenerated(true);
+                } else {
+                    await dispatch(changeUserEmail({ inputValue, userId })).unwrap();
+                    setIsOtpGenerated(false);
+                    closeEditPage();
+                };
+            } else {
+                await dispatch(updateUser({ inputValue, userId })).unwrap();
+                closeEditPage();
+            };
         } catch (error) {
             console.log(error);
         } finally {
-            setIsIdle(false);
+            setIsLoading(false);
+        };
+    };
+
+    const reGenerateOtp = async () => {
+        try {
+            setIsOtpRegenerating(true);
+            await dispatch(sendOtpForEmailChange({ inputValue, userId })).unwrap();
+            setShowResendButton(false);
+            // showing timer of 2 min, resend button after 2 min
+            const timerId = setInterval(() => {
+                setCountdown((prevCountdown) => {
+                    if (prevCountdown === 0) {
+                        clearInterval(timerId);
+                        setShowResendButton(true);
+                        return 120;
+                    } else {
+                        return prevCountdown - 1;
+                    }
+                });
+            }, 1000);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsOtpRegenerating(false);
         };
     };
 
@@ -45,7 +85,8 @@ const Edit = ({ editPageRef, updateType, userId }) => {
             newEmail: '',
             oldPassword: '',
             newPassword: '',
-            password: ''
+            password: '',
+            otp: ''
         });
     };
 
@@ -61,25 +102,33 @@ const Edit = ({ editPageRef, updateType, userId }) => {
                 </div>}
                 {updateType === 'email' && <>
                     <div className="input">
-                        <input type="email" name='oldEmail' placeholder='Enter old email address' required onChange={handleChange} value={oldEmail} />
+                        <input type="email" name='oldEmail' placeholder='Enter old email address' required onChange={handleChange} value={oldEmail} disabled={isOtpGenerated} />
                     </div>
                     <div className="input">
-                        <input type="email" name='newEmail' placeholder='Enter new email address' required onChange={handleChange} value={newEmail} />
+                        <input type="email" name='newEmail' placeholder='Enter new email address' required onChange={handleChange} value={newEmail} disabled={isOtpGenerated} />
                     </div>
+                    {isOtpGenerated && <div className="input">
+                        <input type="text" name='otp' placeholder='Enter OTP' required onChange={handleChange} value={otp} />
+                    </div>}
                 </>}
                 {updateType === 'password' && <><div className="input">
-                    <input type="password" name='oldPassword' placeholder='Enter old password' required onChange={handleChange} value={oldPassword} />
+                    <input type="password" name='oldPassword' placeholder='Enter old password' minLength={6} required onChange={handleChange} value={oldPassword} />
                 </div>
                     <div className="input">
-                        <input type="password" name='newPassword' placeholder='Enter new password' required onChange={handleChange} value={newPassword} />
+                        <input type="password" name='newPassword' placeholder='Enter new password' minLength={6} required onChange={handleChange} value={newPassword} />
                     </div></>}
-                {updateType !== 'password' && <div className="input">
-                    <input type="password" name='password' placeholder='Enter your password' required onChange={handleChange} value={password} />
+                {updateType !== 'password' && !isOtpGenerated && <div className="input">
+                    <input type="password" name='password' placeholder='Enter your password' required minLength={6} onChange={handleChange} value={password} />
                 </div>}
                 <div className="button">
-                    <button type="submit" disabled={isIdle} className={isIdle ? 'disable' : ''}>Save</button>
+                    <button type="submit" disabled={isLoading} className={isLoading ? 'disable' : ''}>{isOtpGenerated && isLoading ? 'Changing' : updateType === 'email' && isOtpGenerated ? 'Change' : updateType === 'email' && isLoading ? 'Sending otp...' : updateType === 'email' ? 'Send otp' : isLoading ? 'Updating...' : 'Update'}</button>
                 </div>
             </form>
+            {isOtpGenerated &&
+                <div className='resend-otp'>
+                    <span>OTP not received yet?</span> {isOtpRegenerating ? <span>Sending...</span> : showResendButton ? <span className='resend' onClick={reGenerateOtp}>Resend OTP</span> : <span>{Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}</span>}
+                </div>
+            }
         </div>
     )
 }

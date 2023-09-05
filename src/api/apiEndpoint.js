@@ -14,6 +14,8 @@ export const updateProfilePicEndpoint = `${serverUrl}/users/upload/profile`;
 export const sendOtpForPassResetEndpoint = `${serverUrl}/users/password-reset/initiate`;
 export const verifyOtpForPassResetEndpoint = `${serverUrl}/users/password-reset/verify`;
 export const PassResetEndpoint = `${serverUrl}/users/password-reset/complete`;
+export const sendOtpForEmailChangeEndpoint = `${serverUrl}/users/change-email/initiate`;
+export const emailChangeEndpoint = `${serverUrl}/users/change-email/complete`;
 
 // Chat API endpoints
 export const createRoomEndpoint = `${serverUrl}/room/initiate`;

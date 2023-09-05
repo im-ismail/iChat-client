@@ -2,7 +2,27 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
 import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
-import { PassResetEndpoint, createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, recentConversationsEndpoint, resendOtpForRegistrationEndpoint, roomConversationEndpoint, sendMessagEndpoint, sendOtpForPassResetEndpoint, sendOtpForRegistrationEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, verifyOtpForPassResetEndpoint, verifyOtpForRegistrationEndpoint } from '../../api/apiEndpoint';
+import {
+    PassResetEndpoint,
+    createRoomEndpoint,
+    deleteUserEndpoint,
+    emailChangeEndpoint,
+    getAllUsersEndpoint,
+    logoutUserEndpoint,
+    recentConversationsEndpoint,
+    resendOtpForRegistrationEndpoint,
+    roomConversationEndpoint,
+    sendMessagEndpoint,
+    sendOtpForEmailChangeEndpoint,
+    sendOtpForPassResetEndpoint,
+    sendOtpForRegistrationEndpoint,
+    updateProfilePicEndpoint,
+    updateUserEndpoint,
+    userAuthenticationEndpoint,
+    userLoginEndpoint,
+    verifyOtpForPassResetEndpoint,
+    verifyOtpForRegistrationEndpoint
+} from '../../api/apiEndpoint';
 
 // Async function for checking user authentication
 export const authenticateUser = createAsyncThunk('chat/authenticateUser', async () => {
@@ -312,6 +332,45 @@ export const resetPassword = createAsyncThunk('chat/passResetResendOtp', async (
     };
     toast(data.message);
     return;
+});
+
+// sending otp for changing email address
+export const sendOtpForEmailChange = createAsyncThunk('chat/changeEmailSendOtp', async ({ inputValue, userId }) => {
+    const res = await fetch(`${sendOtpForEmailChangeEndpoint}/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(inputValue),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        console.log(res);
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return;
+});
+
+// sending otp for changing email address
+export const changeUserEmail = createAsyncThunk('chat/changeEmail', async ({ inputValue, userId }) => {
+    const res = await fetch(`${emailChangeEndpoint}/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(inputValue),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return data.user;
 });
 
 // Defining initial state
@@ -748,6 +807,31 @@ const chatSlice = createSlice({
             state.isLoading = false;
         });
         builder.addCase(resetPassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // send otp for email change
+        builder.addCase(sendOtpForEmailChange.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(sendOtpForEmailChange.fulfilled, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(sendOtpForEmailChange.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // changing user email address
+        builder.addCase(changeUserEmail.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(changeUserEmail.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.currentUser = action.payload;
+        });
+        builder.addCase(changeUserEmail.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = action.error.message;
         });
