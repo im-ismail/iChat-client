@@ -58,6 +58,9 @@ const Login = () => {
                         </div>
                     </form>
                     <div className="link">
+                        <span>Forgot password?</span> <Link to={'/reset-password'} className="link">Click here</Link>
+                    </div>
+                    <div className="link">
                         <Link to={'/register'} className="link">Create new account</Link>
                     </div>
                 </div>

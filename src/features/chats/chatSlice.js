@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
 import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
-import { createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, otpVerificationForRegistrationEndpoint, recentConversationsEndpoint, resendOtpForRegistrationEndpoint, roomConversationEndpoint, sendMessagEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, userRegistrationEndpoint } from '../../api/apiEndpoint';
+import { PassResetEndpoint, createRoomEndpoint, deleteUserEndpoint, getAllUsersEndpoint, logoutUserEndpoint, recentConversationsEndpoint, resendOtpForRegistrationEndpoint, roomConversationEndpoint, sendMessagEndpoint, sendOtpForPassResetEndpoint, sendOtpForRegistrationEndpoint, updateProfilePicEndpoint, updateUserEndpoint, userAuthenticationEndpoint, userLoginEndpoint, verifyOtpForPassResetEndpoint, verifyOtpForRegistrationEndpoint } from '../../api/apiEndpoint';
 
 // Async function for checking user authentication
 export const authenticateUser = createAsyncThunk('chat/authenticateUser', async () => {
@@ -38,7 +38,7 @@ export const userLogin = createAsyncThunk('chat/login', async (userData) => {
 
 // Async function for user registration
 export const userRegistration = createAsyncThunk('chat/registerSendOtp', async (userData) => {
-    const res = await fetch(userRegistrationEndpoint, {
+    const res = await fetch(sendOtpForRegistrationEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ export const userRegistration = createAsyncThunk('chat/registerSendOtp', async (
 
 // Async function for otp verification while registerig
 export const completeRegistration = createAsyncThunk('chat/registerVerifyOtp', async (userData) => {
-    const res = await fetch(otpVerificationForRegistrationEndpoint, {
+    const res = await fetch(verifyOtpForRegistrationEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -72,8 +72,8 @@ export const completeRegistration = createAsyncThunk('chat/registerVerifyOtp', a
     return;
 });
 
-// Async function for user registration
-export const resendOtpForRegistration = createAsyncThunk('chat/registerVerifyOtp', async (userData) => {
+// Async function for otp regeneration while registerig
+export const resendOtpForRegistration = createAsyncThunk('chat/registerResendOtp', async (userData) => {
     const res = await fetch(resendOtpForRegistrationEndpoint, {
         method: 'POST',
         headers: {
@@ -252,6 +252,66 @@ export const updateProfilePicture = createAsyncThunk('chat/updateProfilePicture'
     };
     toast(data.message);
     return data.user;
+});
+
+// Async function for user registration
+export const verifyEmailForPassReset = createAsyncThunk('chat/passResetSendOtp', async (email) => {
+    const res = await fetch(sendOtpForPassResetEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(email)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 100 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return;
+});
+
+// Async function for otp verification while registerig
+export const verifyOtpForPassReset = createAsyncThunk('chat/PassResetVerifyOtp', async (userData) => {
+    const res = await fetch(verifyOtpForPassResetEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(userData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return;
+});
+
+// Async function for user registration
+export const resetPassword = createAsyncThunk('chat/passResetResendOtp', async (userData) => {
+    if (userData.password !== userData.cPassword) {
+        toast("Password and confirm password doesn't match");
+        throw new Error("Password and confirm password doesn't match");
+    };
+    const res = await fetch(PassResetEndpoint, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(userData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return;
 });
 
 // Defining initial state
@@ -491,7 +551,7 @@ const chatSlice = createSlice({
             state.isLoading = false;
             state.isError = action.error.message;
         });
-        // While user registration
+        // While otp generation for registration
         builder.addCase(userRegistration.pending, (state) => {
             state.isLoading = true;
             state.isError = null;
@@ -500,6 +560,30 @@ const chatSlice = createSlice({
             state.isLoading = false;
         });
         builder.addCase(userRegistration.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // While otp verification for registration
+        builder.addCase(completeRegistration.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(completeRegistration.fulfilled, (state) => {
+            state.isLoading = false;
+        });
+        builder.addCase(completeRegistration.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // While otp regeneration for registration
+        builder.addCase(resendOtpForRegistration.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(resendOtpForRegistration.fulfilled, (state) => {
+            state.isLoading = false;
+        });
+        builder.addCase(resendOtpForRegistration.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = action.error.message;
         });
@@ -628,6 +712,42 @@ const chatSlice = createSlice({
             state.currentUser = action.payload;
         });
         builder.addCase(updateProfilePicture.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // generating otp for pass reset
+        builder.addCase(verifyEmailForPassReset.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(verifyEmailForPassReset.fulfilled, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(verifyEmailForPassReset.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // verifying otp for pass reset
+        builder.addCase(verifyOtpForPassReset.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(verifyOtpForPassReset.fulfilled, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(verifyOtpForPassReset.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // reset password
+        builder.addCase(resetPassword.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(resetPassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(resetPassword.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = action.error.message;
         });

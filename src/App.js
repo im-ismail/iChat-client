@@ -11,6 +11,7 @@ import configureSocket from "./services/socket";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { serverUrl } from "./api/apiEndpoint";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 
@@ -54,6 +55,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>

@@ -2,8 +2,8 @@ const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 // User API endpoints
 const userAPI = {
-    userRegistrationEndpoint: `${serverUrl}/users/start-registration`,
-    otpVerificationForRegistrationEndpoint: `${serverUrl}/users/complete-registration`,
+    sendOtpForRegistrationEndpoint: `${serverUrl}/users/start-registration`,
+    verifyOtpForRegistrationEndpoint: `${serverUrl}/users/complete-registration`,
     resendOtpForRegistrationEndpoint: `${serverUrl}/users/register/resend-otp`,
     userLoginEndpoint: `${serverUrl}/users/login`,
     userAuthenticationEndpoint: `${serverUrl}/users/authenticate`,
@@ -12,6 +12,9 @@ const userAPI = {
     logoutUserEndpoint: `${serverUrl}/users/logout`,
     deleteUserEndpoint: `${serverUrl}/users`,
     updateProfilePicEndpoint: `${serverUrl}/users/upload/profile`,
+    sendOtpForPassResetEndpoint: `${serverUrl}/users/password-reset/initiate`,
+    verifyOtpForPassResetEndpoint: `${serverUrl}/users/password-reset/verify`,
+    PassResetEndpoint: `${serverUrl}/users/password-reset/complete`,
 };
 
 // Chat API endpoints

@@ -101,7 +101,7 @@ select {
 
 .link {
   text-align: center;
-  margin: 20px;
+  margin: 20px 0;
 }
 
 .link:hover {
