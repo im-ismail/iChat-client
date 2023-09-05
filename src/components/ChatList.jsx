@@ -5,7 +5,7 @@ import Loading from './Loading';
 import { serverUrl } from '../api/apiEndpoint';
 import { markAsDelivered } from '../services/socket';
 
-const ChatList = ({ fetchRoomConversation }) => {
+const ChatList = ({ fetchRoomConversation, showUserList }) => {
 
     const { isLoading, isError, recentConversations } = useSelector(state => state.chat);
 
@@ -62,6 +62,12 @@ const ChatList = ({ fetchRoomConversation }) => {
                 </div>
             })
             }
+            {!recentConversations?.length && <div className='empty-container'>
+                <h3>No chat found...</h3>
+                <p>Start a new chat by clicking the message button "<i className="fa-brands fa-rocketchat"></i>" below.</p>
+            </div>
+            }
+            <i className="fa-brands fa-rocketchat msg-icon" onClick={showUserList}></i>
         </div>
     )
 }

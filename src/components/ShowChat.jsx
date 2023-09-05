@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { setRoomConversation } from '../features/chats/chatSlice';
+import { setNewChat, setRoomConversation } from '../features/chats/chatSlice';
 import { serverUrl } from '../api/apiEndpoint';
 import msToLastSeen from '../helper/msToLastSeen';
 import ChatPartnerProfile from './ChatPartnerProfile';
@@ -19,6 +19,7 @@ const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms 
     const navigateBack = () => {
         makeItResponsive();
         dispatch(setRoomConversation(null));
+        dispatch(setNewChat(null));
     };
 
     // showing chat partner profile page

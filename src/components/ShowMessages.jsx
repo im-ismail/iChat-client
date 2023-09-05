@@ -19,8 +19,6 @@ const ShowMessages = ({ roomConversation }) => {
         const containerHeight = container.clientHeight;
         const scrollPosition = container.scrollTop;
         const unreadMessagesIds = [];
-        console.log(messagesRef);
-        console.log('ch', containerHeight, 'st', scrollPosition, 'sh', container.scrollHeight, 'cch', container.lastChild.clientHeight, container.lastChild.scrollHeight);
 
         messages.forEach(message => {
             if (!message.read.status && message.sentBy._id === otherUserId) {
@@ -55,8 +53,6 @@ const ShowMessages = ({ roomConversation }) => {
         const isScrolledToBottom = container.scrollHeight - container.clientHeight - container.lastChild.clientHeight <= container.scrollTop + 1;
         // scrolling to bottom incase of isScrolledToBottom is true or if last message was sent by user
         if (isScrolledToBottom || lastMessage.sentBy._id !== otherUserId) {
-            console.log('istb', isScrolledToBottom);
-            console.log('first');
             container.scrollTop = container.scrollHeight - container.clientHeight;
         } else {
             // scrolling to bottom if height of unreadMessages not more than half of container clientHeight otherwise scrolling accordingly
@@ -72,11 +68,8 @@ const ShowMessages = ({ roomConversation }) => {
             };
             const containerHeight = container.clientHeight;
             if (unreadMessagesHeight > containerHeight / 2 && (!currentRoom || currentRoom !== roomId)) {
-                console.log('matched');
-                console.log('umh', unreadMessagesHeight);
                 container.scrollTop = container.scrollHeight - unreadMessagesHeight - (containerHeight / 2);
             } else if (!currentRoom || currentRoom !== roomId) {
-                console.log('second');
                 container.scrollTop = container.scrollHeight - container.clientHeight;
             };
         };
@@ -101,7 +94,7 @@ const ShowMessages = ({ roomConversation }) => {
                         <p className='info'>
                             <span className="message-time">{sendingTime}</span>
                             {senderId !== otherUserId && <span>
-                                {!delivered.status ? <i className="fa-solid fa-check"></i> : <i style={read.status ? { color: 'rgb(57, 57, 247)' } : null} className="fa-solid fa-check-double"></i>}
+                                {!delivered.status ? <i className="fa-solid fa-check"></i> : <i style={read.status ? { color: 'rgb(0, 0, 255)' } : null} className="fa-solid fa-check-double"></i>}
                             </span>}
                         </p>
                     </div>

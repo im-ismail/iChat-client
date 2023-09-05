@@ -3,15 +3,15 @@ import { useSelector } from 'react-redux';
 import Loading from './Loading';
 import ShowChat from './ShowChat';
 
-const ChatPage = ({ loading, error, setJoinedRooms, chatPageRef, makeItResponsive }) => {
+const ChatPage = ({ isLoading, error, setJoinedRooms, chatPageRef, makeItResponsive }) => {
 
     const { newChat, roomConversation } = useSelector(state => state.chat);
 
     return (
         <div className="chat-page" ref={chatPageRef}>
-            {loading && <Loading />}
+            {isLoading && <Loading />}
             {error && <p>Some error occured: {error}</p>}
-            {(newChat || roomConversation) && !loading && !error && (
+            {(newChat || roomConversation) && !isLoading && !error && (
                 <ShowChat
                     newChat={newChat}
                     roomConversation={roomConversation}

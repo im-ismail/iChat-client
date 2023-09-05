@@ -19,7 +19,7 @@ const Home = () => {
     const chatPageRef = useRef();
     const dispatch = useDispatch()
     const [joinedRooms, setJoinedRooms] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // Showing all user list
@@ -79,12 +79,12 @@ const Home = () => {
         };
         try {
             error && setError(null);
-            setLoading(true);
+            setIsLoading(true);
             await dispatch(getConversationByRoomId(roomId)).unwrap();
         } catch (error) {
             setError(error.message);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         };
     };
 
@@ -143,10 +143,10 @@ const Home = () => {
                     makeItResponsive={makeItResponsive}
                 />
                 {currentUser && <Profile profileRef={profileRef} />}
-                <ChatList fetchRoomConversation={fetchRoomConversation} />
+                <ChatList fetchRoomConversation={fetchRoomConversation} showUserList={showUserList} />
             </div>
             <ChatPage
-                loading={loading}
+                isLoading={isLoading}
                 error={error}
                 setJoinedRooms={setJoinedRooms}
                 chatPageRef={chatPageRef}

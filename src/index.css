@@ -273,6 +273,7 @@ select {
   background-color: #ffffff;
   border-right: 1px solid rgb(228, 225, 225);
   display: none;
+  z-index: 2;
 }
 
 .close {
@@ -311,6 +312,7 @@ select {
   background-color: #f1f4f4;
   border-right: 1px solid rgb(228, 225, 225);
   display: none;
+  z-index: 2;
 }
 
 .profile-page .user-profile {
@@ -358,6 +360,7 @@ select {
   background-color: #f1f4f4;
   border-right: 1px solid rgb(228, 225, 225);
   display: none;
+  z-index: 3;
 }
 
 .edit-form {
@@ -369,6 +372,9 @@ select {
   /* height: calc(100% - (50px + 60px)); */
   /* flex: 1; */
   overflow: auto;
+  height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .list {
@@ -438,6 +444,28 @@ select {
 .typing {
   color: rgb(45, 45, 219);
   font-size: 15px;
+}
+
+.empty-container {
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.chat-list .msg-icon {
+  font-size: 1.3rem;
+  color: rgb(237, 237, 237);
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 12px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #288c56;
+  box-shadow: 1px 1px 1px 1px #6fdea3;
 }
 
 /* styling ChatPage component */
