@@ -1,32 +1,22 @@
-const serverUrl = process.env.REACT_APP_SERVER_URL;
+export const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 // User API endpoints
-const userAPI = {
-    sendOtpForRegistrationEndpoint: `${serverUrl}/users/start-registration`,
-    verifyOtpForRegistrationEndpoint: `${serverUrl}/users/complete-registration`,
-    resendOtpForRegistrationEndpoint: `${serverUrl}/users/register/resend-otp`,
-    userLoginEndpoint: `${serverUrl}/users/login`,
-    userAuthenticationEndpoint: `${serverUrl}/users/authenticate`,
-    getAllUsersEndpoint: `${serverUrl}/users`,
-    updateUserEndpoint: `${serverUrl}/users`,
-    logoutUserEndpoint: `${serverUrl}/users/logout`,
-    deleteUserEndpoint: `${serverUrl}/users`,
-    updateProfilePicEndpoint: `${serverUrl}/users/upload/profile`,
-    sendOtpForPassResetEndpoint: `${serverUrl}/users/password-reset/initiate`,
-    verifyOtpForPassResetEndpoint: `${serverUrl}/users/password-reset/verify`,
-    PassResetEndpoint: `${serverUrl}/users/password-reset/complete`,
-};
+export const sendOtpForRegistrationEndpoint = `${serverUrl}/users/start-registration`;
+export const verifyOtpForRegistrationEndpoint = `${serverUrl}/users/complete-registration`;
+export const resendOtpForRegistrationEndpoint = `${serverUrl}/users/register/resend-otp`;
+export const userLoginEndpoint = `${serverUrl}/users/login`;
+export const userAuthenticationEndpoint = `${serverUrl}/users/authenticate`;
+export const getAllUsersEndpoint = `${serverUrl}/users`;
+export const updateUserEndpoint = `${serverUrl}/users`;
+export const logoutUserEndpoint = `${serverUrl}/users/logout`;
+export const deleteUserEndpoint = `${serverUrl}/users`;
+export const updateProfilePicEndpoint = `${serverUrl}/users/upload/profile`;
+export const sendOtpForPassResetEndpoint = `${serverUrl}/users/password-reset/initiate`;
+export const verifyOtpForPassResetEndpoint = `${serverUrl}/users/password-reset/verify`;
+export const PassResetEndpoint = `${serverUrl}/users/password-reset/complete`;
 
 // Chat API endpoints
-const chatAPI = {
-    createRoomEndpoint: `${serverUrl}/room/initiate`,
-    sendMessagEndpoint: `${serverUrl}/room`,
-    recentConversationsEndpoint: `${serverUrl}/room`,
-    roomConversationEndpoint: `${serverUrl}/room`,
-};
-
-module.exports = {
-    serverUrl,
-    ...userAPI,
-    ...chatAPI,
-};
+export const createRoomEndpoint = `${serverUrl}/room/initiate`;
+export const sendMessagEndpoint = `${serverUrl}/room`;
+export const recentConversationsEndpoint = `${serverUrl}/room`;
+export const roomConversationEndpoint = `${serverUrl}/room`;
