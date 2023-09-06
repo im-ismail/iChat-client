@@ -1,17 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import msToTime from '../helper/msToTime';
 import { markAsRead } from '../services/socket';
+import { useDispatch } from 'react-redux';
+import { editMessage } from '../features/chats/chatSlice';
 
 const ShowMessages = ({ roomConversation, chatPageRef }) => {
 
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentModal, setCurrentModal] = useState();
-    const [setselectedMessage, setSetselectedMessage] = useState(null);
+    const [selectedMessage, setSelectedMessage] = useState(null);
     const [showMessageInfo, setShowMessageInfo] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [content, setContent] = useState('');
     const messagesRef = useRef();
     const messageRefs = useRef({});
     const popupModalRefs = useRef({});
-    const infoPopupModalRef = useRef();
+    const editFormRef = useRef();
+    const dispatch = useDispatch();
     const { user, messages } = roomConversation;
     const { _id: otherUserId, roomId } = user;
     let initialDate = '01/01/1970';
@@ -94,7 +99,7 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         };
         const currentModalRef = popupModalRefs.current[conversation._id];
         setCurrentModal(currentModalRef);
-        setSetselectedMessage(conversation);
+        setSelectedMessage(conversation);
         currentModalRef.style.display = 'block';
     };
 
@@ -102,19 +107,44 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
     const closePopupModal = () => {
         if (currentModal) {
             currentModal.style.display = 'none';
-            setShowMessageInfo(false);
         };
+        if (editFormRef) {
+            editFormRef.current.style.display = 'none';
+        };
+        setShowMessageInfo(false);
+        setSelectedMessage(null);
+        setContent('');
     };
-
+    // copying text to clipboard
     const copyText = (text) => {
         navigator.clipboard.writeText(text);
         closePopupModal();
     };
 
+    // showing edit message modal
+    const showEditModal = () => {
+        currentModal.style.display = 'none';
+        setContent(selectedMessage.content);
+        editFormRef.current.style.display = 'block';
+    };
+    // editing message
+    const handleEditMessage = async (e) => {
+        e.preventDefault();
+        try {
+            setIsLoading(true);
+            await dispatch(editMessage({ content, messageId: selectedMessage._id })).unwrap();
+            closePopupModal();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        };
+    };
+
     // will execute when click event uccurs in parent component chatPage
     const handleParentClick = (e) => {
         // if click event occurs outside popal modal, modal will close
-        if (currentModal && !currentModal.contains(e.target)) {
+        if ((currentModal && !currentModal.contains(e.target)) && (editFormRef && !editFormRef.current.contains(e.target))) {
             closePopupModal();
         };
     };
@@ -161,15 +191,15 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                                 <span><i style={{ color: 'rgb(0, 0, 255)' }} className="fa-solid fa-check-double"></i> Seen</span>
                                 <span className='time'>{read.status ? `${readDate}, ${readTime}` : '---'}</span>
                             </p> : <>
-                                <p>
+                                {otherUserId !== senderId && <p onClick={showEditModal}>
                                     <i className="fa-regular fa-pen-to-square icons"></i><span>Edit</span>
-                                </p>
+                                </p>}
                                 <p>
                                     <i className="fa-solid fa-trash icons single-delete"></i><span>Delete for me</span>
                                 </p>
-                                <p>
+                                {otherUserId !== senderId && <p>
                                     <i className="fa-solid fa-trash icons all-delete"></i><span>Delete for everyone</span>
-                                </p>
+                                </p>}
                             </>
                             }
                         </div>
@@ -204,6 +234,17 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                     }
                 })
             }
+            {/* popup modal for editing message */}
+            <div className="edit-popup" ref={editFormRef}>
+                <form onSubmit={handleEditMessage}>
+                    <div className="input">
+                        <input type="text" name='content' className="input-field" required value={content} onChange={e => setContent(e.target.value)} />
+                    </div>
+                    <div className="button">
+                        <button type="submit" disabled={isLoading} className={isLoading ? 'disable' : ''}>{isLoading ? 'Updating...' : 'Update'}</button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

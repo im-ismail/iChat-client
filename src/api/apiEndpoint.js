@@ -22,3 +22,4 @@ export const createRoomEndpoint = `${serverUrl}/room/initiate`;
 export const sendMessagEndpoint = `${serverUrl}/room`;
 export const recentConversationsEndpoint = `${serverUrl}/room`;
 export const roomConversationEndpoint = `${serverUrl}/room`;
+export const editMessageEndpoint = `${serverUrl}/room/message`;

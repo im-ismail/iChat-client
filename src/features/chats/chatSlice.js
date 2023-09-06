@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
-import { checkRooms, emitMessage, joinRoom } from '../../services/socket';
+import { checkRooms, emitEditedMessage, emitMessage, joinRoom } from '../../services/socket';
 import {
     PassResetEndpoint,
     createRoomEndpoint,
     deleteUserEndpoint,
+    editMessageEndpoint,
     emailChangeEndpoint,
     getAllUsersEndpoint,
     logoutUserEndpoint,
@@ -373,6 +374,26 @@ export const changeUserEmail = createAsyncThunk('chat/changeEmail', async ({ inp
     return data.user;
 });
 
+// editing message
+export const editMessage = createAsyncThunk('chat/editMessage', async ({ content, messageId }) => {
+    const res = await fetch(`${editMessageEndpoint}/${messageId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ content }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message.length < 80 ? data.message : 'Some error occured');
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    emitEditedMessage(data.data);
+    return data.data;
+});
+
 // Defining initial state
 const initialState = {
     isLoading: false,
@@ -576,6 +597,43 @@ const chatSlice = createSlice({
             state.allRoomConversations = state.allRoomConversations?.map(conversation => {
                 if (conversation.user.roomId === roomId) {
                     return { ...conversation, messages: newUpdatedMessages };
+                } else {
+                    return conversation;
+                };
+            });
+        },
+        updateEditedMessages: (state, action) => {
+            const editedMessage = action.payload;
+            const updateRecentConversations = (conversations) => {
+                return conversations.map((conversation) => {
+                    if (conversation.message._id === editedMessage._id) {
+                        return { user: { ...conversation.user }, message: { ...conversation.message, content: editedMessage.content } };
+                    } else {
+                        return conversation;
+                    };
+                });
+            };
+            state.recentConversations = updateRecentConversations(state.recentConversations);
+            state.tempRecentConversations = updateRecentConversations(state.tempRecentConversations);
+
+            if (!state.roomConversation) return;
+
+            const filteredRoomConversation = state.allRoomConversations.filter(conversation => conversation.user.roomId === editedMessage.roomId);
+            if (!filteredRoomConversation.length) return;
+
+            const { user, messages } = filteredRoomConversation[0];
+            const updatedMessages = messages.map((message) => {
+                if (message._id === editedMessage._id) {
+                    return { ...message, content: editedMessage.content };
+                } else {
+                    return message
+                };
+            });
+            const updatedRoomConversation = { user, messages: updatedMessages };
+            state.roomConversation = { ...state.roomConversation, messages: updatedMessages };
+            state.allRoomConversations = state.allRoomConversations.map((conversation) => {
+                if (conversation.user.roomId === editedMessage.roomId) {
+                    return updatedRoomConversation;
                 } else {
                     return conversation;
                 };
@@ -835,8 +893,54 @@ const chatSlice = createSlice({
             state.isLoading = false;
             state.isError = action.error.message;
         });
+        // editing message
+        builder.addCase(editMessage.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(editMessage.fulfilled, (state, action) => {
+            const editedMessage = action.payload;
+            const updateRecentConversations = (conversations) => {
+                return conversations.map((conversation) => {
+                    if (conversation.message._id === editedMessage._id) {
+                        return { user: { ...conversation.user }, message: { ...conversation.message, content: editedMessage.content } };
+                    } else {
+                        return conversation;
+                    };
+                });
+            };
+            state.recentConversations = updateRecentConversations(state.recentConversations);
+            state.tempRecentConversations = updateRecentConversations(state.tempRecentConversations);
+
+            if (!state.roomConversation) return;
+
+            const filteredRoomConversation = state.allRoomConversations.filter(conversation => conversation.user.roomId === editedMessage.roomId);
+            if (!filteredRoomConversation.length) return;
+
+            const { user, messages } = filteredRoomConversation[0];
+            const updatedMessages = messages.map((message) => {
+                if (message._id === editedMessage._id) {
+                    return { ...message, content: editedMessage.content };
+                } else {
+                    return message
+                };
+            });
+            const updatedRoomConversation = { user, messages: updatedMessages };
+            state.roomConversation = { ...state.roomConversation, messages: updatedMessages };
+            state.allRoomConversations = state.allRoomConversations.map((conversation) => {
+                if (conversation.user.roomId === editedMessage.roomId) {
+                    return updatedRoomConversation;
+                } else {
+                    return conversation;
+                };
+            });
+        });
+        builder.addCase(editMessage.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
     }
 });
 
-export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, markMessagesAsRead, markMessagesAsDelivered } = chatSlice.actions;
+export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, markMessagesAsRead, markMessagesAsDelivered, updateEditedMessages } = chatSlice.actions;
 export default chatSlice.reducer;

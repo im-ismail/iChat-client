@@ -1,4 +1,4 @@
-import { markMessagesAsDelivered, markMessagesAsRead, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
+import { markMessagesAsDelivered, markMessagesAsRead, updateEditedMessages, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
 
 let socket = null;
 let dispatch = null;
@@ -33,9 +33,13 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
     socket.on('mark-read', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
         dispatch(markMessagesAsRead({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
     });
-
+    // receiving event to mark messages as delivered
     socket.on('mark-delivered', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
         dispatch(markMessagesAsDelivered({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
+    });
+    // receiving event with edited message to update messages
+    socket.on('edited-message', (editedMessage) => {
+        dispatch(updateEditedMessages(editedMessage));
     });
 };
 // This will be called for the first time when user login and will check for available room to connect where other user is already on that room
@@ -63,6 +67,10 @@ const markAsRead = (ids, roomId, otherUserId) => {
 const markAsDelivered = (roomId, otherUserId) => {
     socket.emit('mark-delivered', { roomId, otherUserId });
 };
+// sending edited message to other user
+const emitEditedMessage = (editedMessage) => {
+    socket.emit('edited-message', editedMessage);
+};
 
-export { checkRooms, joinRoom, emitMessage, emitTyping, markAsRead, markAsDelivered };
+export { checkRooms, joinRoom, emitMessage, emitTyping, markAsRead, markAsDelivered, emitEditedMessage };
 export default configureSocket;
