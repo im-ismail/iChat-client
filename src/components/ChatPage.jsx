@@ -17,6 +17,7 @@ const ChatPage = ({ isLoading, error, setJoinedRooms, chatPageRef, makeItRespons
                     roomConversation={roomConversation}
                     makeItResponsive={makeItResponsive}
                     setJoinedRooms={setJoinedRooms}
+                    chatPageRef={chatPageRef}
                 />
             )}
         </div>

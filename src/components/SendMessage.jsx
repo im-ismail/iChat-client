@@ -67,7 +67,7 @@ const SendMessage = ({ user, setJoinedRooms }) => {
             <form onSubmit={handleSendMessage}>
                 <div className='input-container'>
                     <span className='emoji-field' onClick={handleToggleEmojiPicker} ref={emojiPickerOpenRef}><i className="fa-regular fa-face-smile"></i></span>
-                    <input type="text" className="input-field" required value={message} onChange={handleChange} />
+                    <input type="text" name='message' className="input-field" required value={message} onChange={handleChange} />
                 </div>
                 {showEmojiPicker && (
                     <div className='emoji-picker-container' ref={emojiPickerRef}>

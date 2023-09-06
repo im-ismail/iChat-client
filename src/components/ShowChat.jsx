@@ -7,7 +7,7 @@ import ChatPartnerProfile from './ChatPartnerProfile';
 import SendMessage from './SendMessage';
 import ShowMessages from './ShowMessages';
 
-const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms }) => {
+const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms, chatPageRef }) => {
 
     const user = newChat ?? roomConversation.user;
     const { name, image, typing, online, lastSeen } = user;
@@ -42,7 +42,7 @@ const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms 
             </div>
             <ChatPartnerProfile user={user} profileRef={profileRef} />
             <div className="messages-container">
-                {roomConversation && <ShowMessages roomConversation={roomConversation} />}
+                {roomConversation && <ShowMessages roomConversation={roomConversation} chatPageRef={chatPageRef} />}
             </div>
             <SendMessage
                 user={user}
