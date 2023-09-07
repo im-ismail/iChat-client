@@ -3,7 +3,7 @@ import msToTime from '../helper/msToTime';
 import { useSelector } from 'react-redux';
 import Loading from './Loading';
 import { serverUrl } from '../api/apiEndpoint';
-import { markAsDelivered } from '../services/socket';
+import { markMessagesAsDelivered } from '../features/chats/chatSlice';
 
 const ChatList = ({ fetchRoomConversation, showUserList }) => {
 
@@ -16,7 +16,7 @@ const ChatList = ({ fetchRoomConversation, showUserList }) => {
                 const { _id, roomId } = user;
                 const { sentBy, delivered } = message;
                 if (_id === sentBy._id && !delivered.status) {
-                    markAsDelivered(roomId, _id);
+                    markMessagesAsDelivered(roomId, _id);
                 };
             });
         };

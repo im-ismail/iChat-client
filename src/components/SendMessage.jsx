@@ -53,7 +53,7 @@ const SendMessage = ({ user, setJoinedRooms }) => {
                 setMessage('');
                 // adding this newly created roomId to subscribedRoom to avoid any conflict
                 if (!roomId) {
-                    setJoinedRooms(prev => prev ? [...prev, data.user.roomId] : [data.user.roomId]);
+                    setJoinedRooms(prev => prev ? [...prev, data.message.roomId] : [data.message.roomId]);
                 };
             } catch (error) {
                 console.log(error);

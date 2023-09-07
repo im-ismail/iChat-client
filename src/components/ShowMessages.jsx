@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import msToTime from '../helper/msToTime';
-import { markAsRead } from '../services/socket';
 import { useDispatch } from 'react-redux';
-import { editMessage } from '../features/chats/chatSlice';
+import { editMessage, markMessagesAsSeen } from '../features/chats/chatSlice';
 
 const ShowMessages = ({ roomConversation, chatPageRef }) => {
 
@@ -13,12 +12,15 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState('');
     const [deleteType, setDeleteType] = useState('');
+
     const messagesRef = useRef();
     const messageRefs = useRef({});
     const popupModalRefs = useRef({});
     const editFormRef = useRef();
     const deleteRef = useRef();
+
     const dispatch = useDispatch();
+
     const { user, messages } = roomConversation;
     const { _id: otherUserId, roomId } = user;
     let initialDate = '01/01/1970';
@@ -45,7 +47,7 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
             };
         });
         if (unreadMessagesIds.length) {
-            markAsRead(unreadMessagesIds, roomId, otherUserId);
+            markMessagesAsSeen(unreadMessagesIds, roomId, otherUserId);
         };
     };
 
@@ -165,8 +167,10 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         // adding and removing event listener on parent component chatpage to handle the popup modal
         chatPageRef.current.addEventListener('click', handleParentClick);
 
-        return () => {
-            chatPageRef.current.removeEventListener('click', handleParentClick);
+        if (chatPageRef) {
+            return () => {
+                chatPageRef.current.removeEventListener('click', handleParentClick);
+            };
         };
     }, [currentModal]);
 

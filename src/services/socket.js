@@ -1,4 +1,4 @@
-import { markMessagesAsDelivered, markMessagesAsRead, updateEditedMessages, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
+import { updateDeliveredMessages, updateSeenMessages, updateEditedMessages, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
 
 let socket = null;
 let dispatch = null;
@@ -14,8 +14,8 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
         console.log(`⚡: ${socket.id} connected`);
     });
     // receiving messages
-    socket.on('new-message', (conversation) => {
-        dispatch(updateReceivedConversation(conversation));
+    socket.on('new-message', (data) => {
+        dispatch(updateReceivedConversation(data));
     });
     // receiving updated user details
     socket.on('update-user-status', updatedUser => {
@@ -30,15 +30,15 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
         }, 2000);
     });
     // receiving event to mark messages as read
-    socket.on('mark-read', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
-        dispatch(markMessagesAsRead({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
+    socket.on('mark-seen', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
+        dispatch(updateSeenMessages({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
     });
     // receiving event to mark messages as delivered
     socket.on('mark-delivered', ({ updatedMessages, roomId, otherUserId, unreadMessagesCount }) => {
-        dispatch(markMessagesAsDelivered({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
+        dispatch(updateDeliveredMessages({ updatedMessages, roomId, otherUserId, unreadMessagesCount }));
     });
     // receiving event with edited message to update messages
-    socket.on('edited-message', (editedMessage) => {
+    socket.on('update-edited-message', (editedMessage) => {
         dispatch(updateEditedMessages(editedMessage));
     });
 };
@@ -50,27 +50,10 @@ const checkRooms = (rooms) => {
 const joinRoom = (roomId, otherUserId) => {
     socket.emit('join-room', { roomId, otherUserId });
 };
-// For sending message
-const emitMessage = (message) => {
-    socket.emit('new-message', message);
-};
 // sending typing alert
 const emitTyping = (roomId) => {
     socket.emit('typing', roomId);
 };
-// emitting event to mark messages as read
-const markAsRead = (ids, roomId, otherUserId) => {
-    socket.emit('mark-read', { ids, roomId, otherUserId });
-};
 
-// emitting event to mark messages as delivered
-const markAsDelivered = (roomId, otherUserId) => {
-    socket.emit('mark-delivered', { roomId, otherUserId });
-};
-// sending edited message to other user
-const emitEditedMessage = (editedMessage) => {
-    socket.emit('edited-message', editedMessage);
-};
-
-export { checkRooms, joinRoom, emitMessage, emitTyping, markAsRead, markAsDelivered, emitEditedMessage };
+export { checkRooms, joinRoom, emitTyping };
 export default configureSocket;

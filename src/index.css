@@ -644,7 +644,7 @@ textarea:focus {
 }
 
 .messages .first-message {
-  /* overflow-x: auto; */
+  /* overflow: auto; */
 }
 
 .messages .show-date {
