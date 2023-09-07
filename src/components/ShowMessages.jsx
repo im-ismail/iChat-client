@@ -12,10 +12,12 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
     const [showMessageInfo, setShowMessageInfo] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState('');
+    const [deleteType, setDeleteType] = useState('');
     const messagesRef = useRef();
     const messageRefs = useRef({});
     const popupModalRefs = useRef({});
     const editFormRef = useRef();
+    const deleteRef = useRef();
     const dispatch = useDispatch();
     const { user, messages } = roomConversation;
     const { _id: otherUserId, roomId } = user;
@@ -111,9 +113,13 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         if (editFormRef) {
             editFormRef.current.style.display = 'none';
         };
+        if (deleteRef) {
+            deleteRef.current.style.display = 'none';
+        };
         setShowMessageInfo(false);
         setSelectedMessage(null);
         setContent('');
+        setDeleteType('');
     };
     // copying text to clipboard
     const copyText = (text) => {
@@ -140,11 +146,17 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
             setIsLoading(false);
         };
     };
+    // showing popup modal for deleting messages
+    const showDeleteModal = (type) => {
+        currentModal.style.display = 'none';
+        setDeleteType(type);
+        deleteRef.current.style.display = 'block';
+    };
 
     // will execute when click event uccurs in parent component chatPage
     const handleParentClick = (e) => {
         // if click event occurs outside popal modal, modal will close
-        if ((currentModal && !currentModal.contains(e.target)) && (editFormRef && !editFormRef.current.contains(e.target))) {
+        if ((currentModal && !currentModal.contains(e.target)) && (editFormRef && !editFormRef.current.contains(e.target)) && (deleteRef && !deleteRef.current.contains(e.target))) {
             closePopupModal();
         };
     };
@@ -194,10 +206,10 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                                 {otherUserId !== senderId && <p onClick={showEditModal}>
                                     <i className="fa-regular fa-pen-to-square icons"></i><span>Edit</span>
                                 </p>}
-                                <p>
+                                <p onClick={() => showDeleteModal('me')}>
                                     <i className="fa-solid fa-trash icons single-delete"></i><span>Delete for me</span>
                                 </p>
-                                {otherUserId !== senderId && <p>
+                                {otherUserId !== senderId && <p onClick={() => showDeleteModal('everyone')}>
                                     <i className="fa-solid fa-trash icons all-delete"></i><span>Delete for everyone</span>
                                 </p>}
                             </>
@@ -244,6 +256,14 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                         <button type="submit" disabled={isLoading} className={isLoading ? 'disable' : ''}>{isLoading ? 'Updating...' : 'Update'}</button>
                     </div>
                 </form>
+            </div>
+            {/* popup modal for de3leting messages */}
+            <div className='delete-popup' ref={deleteRef}>
+                <p>{deleteType === 'everyone' ? 'This message will be deleted for everyone in this chat.' : 'This message will be deleted for you.'}</p>
+                <div className='buttons'>
+                    <button>Cancel</button>
+                    <button className='delete'>Delete</button>
+                </div>
             </div>
         </div>
     )
