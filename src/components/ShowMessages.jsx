@@ -54,6 +54,7 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
     // setting scroll behaviour of chat page
     useEffect(() => {
         const container = messagesRef.current;
+        console.log(messagesRef);
         // adding scroll listener to message container with messages dependency to access updated messages inside from handleMessagesScroll
         container.addEventListener('scroll', handleMessageScroll);
         // calling handleMessageScroll function if messages are not scrollable to mark them as read
@@ -64,7 +65,10 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         // finding last message from messages array
         const lastMessage = messages[messages.length - 1];
         // checking if user already scrolled to bottom before arriving new message
-        const isScrolledToBottom = container.scrollHeight - container.clientHeight - container.lastChild.clientHeight <= container.scrollTop + 1;
+        // const isScrolledToBottom = container.scrollHeight - container.clientHeight - container.lastChild.clientHeight <= container.scrollTop + 1;
+        // getting last message element from messageRefs because container.lastChild contains delete popup
+        let lastMessageElement = messageRefs.current[lastMessage._id];
+        const isScrolledToBottom = container.scrollHeight - container.clientHeight - lastMessageElement.clientHeight <= container.scrollTop + 1 + 1;
         // scrolling to bottom incase of isScrolledToBottom is true or if last message was sent by user
         if (isScrolledToBottom || lastMessage.sentBy._id !== otherUserId) {
             container.scrollTop = container.scrollHeight - container.clientHeight;
