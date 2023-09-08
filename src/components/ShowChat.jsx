@@ -7,7 +7,7 @@ import ChatPartnerProfile from './ChatPartnerProfile';
 import SendMessage from './SendMessage';
 import ShowMessages from './ShowMessages';
 
-const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms, chatPageRef }) => {
+const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms, chatPageRef, currentUser }) => {
 
     const user = newChat ?? roomConversation.user;
     const { name, image, typing, online, lastSeen } = user;
@@ -47,6 +47,7 @@ const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms,
             <SendMessage
                 user={user}
                 setJoinedRooms={setJoinedRooms}
+                currentUser={currentUser}
             />
         </>
     )

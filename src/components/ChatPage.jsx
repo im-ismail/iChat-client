@@ -5,7 +5,7 @@ import ShowChat from './ShowChat';
 
 const ChatPage = ({ isLoading, error, setJoinedRooms, chatPageRef, makeItResponsive }) => {
 
-    const { newChat, roomConversation } = useSelector(state => state.chat);
+    const { newChat, roomConversation, currentUser } = useSelector(state => state.chat);
 
     return (
         <div className="chat-page" ref={chatPageRef}>
@@ -18,6 +18,7 @@ const ChatPage = ({ isLoading, error, setJoinedRooms, chatPageRef, makeItRespons
                     makeItResponsive={makeItResponsive}
                     setJoinedRooms={setJoinedRooms}
                     chatPageRef={chatPageRef}
+                    currentUser={currentUser}
                 />
             )}
         </div>

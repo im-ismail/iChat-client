@@ -175,7 +175,7 @@ const initiateChat = async (userId) => {
 
 // send message and update conversation
 export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message, roomId, otherUserId }, { getState, dispatch }) => {
-    const { currentUser, newChat } = getState().chat;
+    const { newChat } = getState().chat;
     if (!roomId) {
         // initiating room if not already created
         roomId = await initiateChat(otherUserId);
@@ -183,8 +183,9 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message
         joinRoom(roomId, otherUserId);
     };
     // setting new chat value to null if there was is
+    // will do same thing when updating conversation that will solve problem related to roomConversation when more than one tab open
     if (newChat) {
-        dispatch(setNewChat(null));
+        // dispatch(setNewChat(null));
     };
     const res = await fetch(`${sendMessagEndpoint}/${roomId}/message`, {
         method: 'POST',
@@ -489,13 +490,15 @@ const chatSlice = createSlice({
             if (!state.roomConversation && !isSender) return;
 
             // updating room conversation
-            const roomConversation = state.roomConversation && state.roomConversation.user.roomId === user.roomId ? { ...state.roomConversation, messages: [...state.roomConversation.messages, message] } : isSender ? { user, messages: [message] } : state.roomConversation;
+            const roomConversation = state.roomConversation && state.roomConversation.user.roomId === user.roomId ? { ...state.roomConversation, messages: [...state.roomConversation.messages, message] } : isSender && state.newChat ? { user, messages: [message] } : state.roomConversation;
             //updating all room conversation
             const allRoomConversations = state.allRoomConversations.filter((conversation) => {
                 return conversation.user.roomId !== user.roomId;
             });
 
             state.roomConversation = roomConversation;
+            // this will solve the problem of being added this single conversation in other tab room roomConversation when there is no roomConversation in other tab. additional check applied above '&& state.newChat'
+            state.newChat = null;
             state.allRoomConversations = [...allRoomConversations, roomConversation];
         },
         updateUserStatus: (state, action) => {
@@ -544,16 +547,17 @@ const chatSlice = createSlice({
             state.allRoomConversations = updatedAllRoomConversations;
         },
         updateTypingStatus: (state, action) => {
-            const { roomId, typing } = action.payload;
+            const { roomId, typingUserId, typing } = action.payload;
+            // added additional check '&& state.currentUser._id !== typingUserId' to solve problem of same user from other tab getting typing event. typing status should update only chat partner not same user from other tab
             const updatedRecentConversations = state.recentConversations.map((conversation) => {
-                if (conversation.user.roomId === roomId) {
+                if (conversation.user.roomId === roomId && state.currentUser._id !== typingUserId) {
                     return { ...conversation, user: { ...conversation.user, typing } };
                 } else {
                     return conversation;
                 };
             });
             state.recentConversations = updatedRecentConversations;
-            state.roomConversation = state.roomConversation && state.roomConversation.user.roomId === roomId ? { ...state.roomConversation, user: { ...state.roomConversation.user, typing } } : state.roomConversation;
+            state.roomConversation = state.roomConversation && state.roomConversation.user.roomId === roomId && state.currentUser._id !== typingUserId ? { ...state.roomConversation, user: { ...state.roomConversation.user, typing } } : state.roomConversation;
         },
         updateDeliveredMessages: (state, action) => {
             const { updatedMessages, roomId, otherUserId, unreadMessagesCount } = action.payload;
@@ -602,11 +606,11 @@ const chatSlice = createSlice({
                     const { user, message } = conversation;
                     if (user.roomId === roomId) {
                         const updatedMessage = updatedMessages.find(msg => msg._id === message._id);
-                        // here changing delivered status because if user online and not connected to room and other user comes online message status changes to delivered in database and also emit event but user not able to receive event because room connection was not established at that time
+                        // here changing delivered status because if user online and not connected to room and other user comes online message status changes to delivered in database and also emit event but user not able to receive event because room connection was not established at that time // ××× no need, fixed from server side
                         if (updatedMessage) {
-                            return { user, message: { ...message, delivered: updatedMessage.delivered, read: updatedMessage.read, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
+                            return { user, message: { ...message, read: updatedMessage.read, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
                         } else {
-                            return { user, message: { ...message, delivered: { status: true }, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
+                            return { user, message: { ...message, unreadMessagesCount: user._id === otherUserId ? unreadMessagesCount : message.unreadMessagesCount } };
                         }
                     } else {
                         return conversation;

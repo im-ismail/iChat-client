@@ -22,11 +22,11 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
         dispatch(updateUserStatus(updatedUser));
     });
     // receiving typing event
-    socket.on('typing', (roomId) => {
+    socket.on('typing', ({ roomId, typingUserId }) => {
         clearTimeout(timeOut);
-        dispatch(updateTypingStatus({ roomId, typing: true }));
+        dispatch(updateTypingStatus({ roomId, typingUserId, typing: true }));
         timeOut = setTimeout(() => {
-            dispatch(updateTypingStatus({ roomId, typing: false }));
+            dispatch(updateTypingStatus({ roomId, typingUserId, typing: false }));
         }, 2000);
     });
     // receiving event to mark messages as read
@@ -51,8 +51,8 @@ const joinRoom = (roomId, otherUserId) => {
     socket.emit('join-room', { roomId, otherUserId });
 };
 // sending typing alert
-const emitTyping = (roomId) => {
-    socket.emit('typing', roomId);
+const emitTyping = (roomId, typingUserId) => {
+    socket.emit('typing', { roomId, typingUserId });
 };
 
 export { checkRooms, joinRoom, emitTyping };

@@ -4,7 +4,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { emitTyping } from '../services/socket';
 import { sendMessage } from '../features/chats/chatSlice';
 
-const SendMessage = ({ user, setJoinedRooms }) => {
+const SendMessage = ({ user, setJoinedRooms, currentUser }) => {
 
     const { _id: otherUserId, roomId, name } = user;
     const [message, setMessage] = useState('');
@@ -18,13 +18,17 @@ const SendMessage = ({ user, setJoinedRooms }) => {
         setMessage(e.target.value);
         // this will only send typing event if users are connected
         if (roomId) {
-            emitTyping(roomId);
+            emitTyping(roomId, currentUser._id);
         };
     };
     // function for emoji input
     const handleEmojiClick = (emojiData, event) => {
         const emoji = emojiData.emoji;
         setMessage((prevMessage) => prevMessage + emoji);
+        // this will only send typing event if users are connected
+        if (roomId) {
+            emitTyping(roomId, currentUser._id);
+        };
     };
     // toggling emoji picker
     const handleToggleEmojiPicker = () => {
@@ -67,7 +71,7 @@ const SendMessage = ({ user, setJoinedRooms }) => {
             <form onSubmit={handleSendMessage}>
                 <div className='input-container'>
                     <span className='emoji-field' onClick={handleToggleEmojiPicker} ref={emojiPickerOpenRef}><i className="fa-regular fa-face-smile"></i></span>
-                    <input type="text" name='message' className="input-field" required value={message} onChange={handleChange} />
+                    <input type="text" className="input-field" required value={message} onChange={handleChange} />
                 </div>
                 {showEmojiPicker && (
                     <div className='emoji-picker-container' ref={emojiPickerRef}>
