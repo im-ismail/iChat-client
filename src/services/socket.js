@@ -1,4 +1,4 @@
-import { updateDeliveredMessages, updateSeenMessages, updateEditedMessages, updateReceivedConversation, updateTypingStatus, updateUserStatus } from "../features/chats/chatSlice";
+import { updateDeliveredMessages, updateSeenMessages, updateEditedMessage, updateReceivedConversation, updateTypingStatus, updateUserStatus, updateEveryoneDeletedMessage } from "../features/chats/chatSlice";
 
 let socket = null;
 let dispatch = null;
@@ -39,7 +39,11 @@ const configureSocket = (socketInstance, userId, useDispatch) => {
     });
     // receiving event with edited message to update messages
     socket.on('update-edited-message', (editedMessage) => {
-        dispatch(updateEditedMessages(editedMessage));
+        dispatch(updateEditedMessage(editedMessage));
+    });
+    // receiving event with deleted message to update messages
+    socket.on('update-deleted-message', (updatedMessage) => {
+        dispatch(updateEveryoneDeletedMessage(updatedMessage));
     });
 };
 // This will be called for the first time when user login and will check for available room to connect where other user is already on that room

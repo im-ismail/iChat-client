@@ -8,6 +8,7 @@ import {
     deleteUserEndpoint,
     editMessageEndpoint,
     emailChangeEndpoint,
+    everyoneMessageDeleteEndpoint,
     getAllUsersEndpoint,
     logoutUserEndpoint,
     markDeliveredEndpoint,
@@ -19,6 +20,7 @@ import {
     sendOtpForEmailChangeEndpoint,
     sendOtpForPassResetEndpoint,
     sendOtpForRegistrationEndpoint,
+    singleMessageDeleteEndpoint,
     updateProfilePicEndpoint,
     updateUserEndpoint,
     userAuthenticationEndpoint,
@@ -429,6 +431,38 @@ export const markMessagesAsSeen = async (unreadMessagesIds, roomId, otherUserId)
         console.log(error);
     };
 };
+// deleting message for single user
+export const deleteMessageForSingleUser = createAsyncThunk('chat/deleteForMe', async ({ messageId, senderId }) => {
+    const res = await fetch(`${singleMessageDeleteEndpoint}/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ senderId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.message);
+    };
+    return data.updatedMessage;
+});
+// deleting message for everyone
+export const deleteMessageForEveryone = createAsyncThunk('chat/deleteForEveryone', async ({ messageId, senderId }) => {
+    const res = await fetch(`${everyoneMessageDeleteEndpoint}/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ senderId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.message);
+    };
+    return data.updatedMessage;
+});
 
 // Defining initial state
 const initialState = {
@@ -487,7 +521,7 @@ const chatSlice = createSlice({
             };
             state.recentConversations = updateConversation(state.recentConversations);
             state.tempRecentConversations = updateConversation(state.tempRecentConversations);
-            if (!state.roomConversation && !isSender) return;
+            if (!state.roomConversation && (!isSender || !state.newChat)) return;
 
             // updating room conversation
             const roomConversation = state.roomConversation && state.roomConversation.user.roomId === user.roomId ? { ...state.roomConversation, messages: [...state.roomConversation.messages, message] } : isSender && state.newChat ? { user, messages: [message] } : state.roomConversation;
@@ -578,6 +612,7 @@ const chatSlice = createSlice({
             state.tempRecentConversations = updateConversationMessages(state.tempRecentConversations);
 
             // updating roomConversation and allRoomConversation
+            if (!state.roomConversation) return;
             const messages = state.roomConversation?.user.roomId === roomId ? state.roomConversation?.messages : state.allRoomConversations?.find(conversation => conversation.user.roomId === roomId)?.messages ?? null;
             if (!messages) return;
             const newUpdatedMessages = messages.map((message) => {
@@ -642,12 +677,12 @@ const chatSlice = createSlice({
                 };
             });
         },
-        updateEditedMessages: (state, action) => {
+        updateEditedMessage: (state, action) => {
             const editedMessage = action.payload;
             const updateRecentConversations = (conversations) => {
                 return conversations.map((conversation) => {
                     if (conversation.message._id === editedMessage._id) {
-                        return { user: { ...conversation.user }, message: { ...conversation.message, content: editedMessage.content } };
+                        return { user: { ...conversation.user }, message: { ...conversation.message, content: editedMessage.content, isEdited: editedMessage.isEdited } };
                     } else {
                         return conversation;
                     };
@@ -664,15 +699,53 @@ const chatSlice = createSlice({
             const { user, messages } = filteredRoomConversation[0];
             const updatedMessages = messages.map((message) => {
                 if (message._id === editedMessage._id) {
-                    return { ...message, content: editedMessage.content };
+                    return { ...message, content: editedMessage.content, isEdited: editedMessage.isEdited };
                 } else {
                     return message
                 };
             });
             const updatedRoomConversation = { user, messages: updatedMessages };
-            state.roomConversation = { ...state.roomConversation, messages: updatedMessages };
+            state.roomConversation = state.roomConversation.user.roomId === user.roomId ? { ...state.roomConversation, messages: updatedMessages } : state.roomConversation;
             state.allRoomConversations = state.allRoomConversations.map((conversation) => {
                 if (conversation.user.roomId === editedMessage.roomId) {
+                    return updatedRoomConversation;
+                } else {
+                    return conversation;
+                };
+            });
+        },
+        updateEveryoneDeletedMessage: (state, action) => {
+            const updatedMessage = action.payload;
+            const { _id, roomId, content, deletedForEveryone } = updatedMessage;
+            const updateRecentConversations = (conversations) => {
+                return conversations.map((conversation) => {
+                    const { message } = conversation;
+                    if (message._id === _id) {
+                        return { ...conversation, message: { ...message, content, deletedForEveryone } };
+                    } else {
+                        return conversation;
+                    };
+                });
+            };
+            state.recentConversations = updateRecentConversations(state.recentConversations);
+            state.tempRecentConversations = updateRecentConversations(state.tempRecentConversations);
+
+            if (!state.roomConversation) return;
+            const filteredRoomConversation = state.allRoomConversations.filter(conversation => conversation.user.roomId === roomId);
+            if (!filteredRoomConversation.length) return;
+
+            const { user, messages } = filteredRoomConversation[0];
+            const updatedMessages = messages.map((message) => {
+                if (message._id === _id) {
+                    return { ...message, content, deletedForEveryone };
+                } else {
+                    return message
+                };
+            });
+            const updatedRoomConversation = { user, messages: updatedMessages };
+            state.roomConversation = state.roomConversation.user.roomId === roomId ? { ...state.roomConversation, messages: updatedMessages } : state.roomConversation;
+            state.allRoomConversations = state.allRoomConversations.map((conversation) => {
+                if (conversation.user.roomId === roomId) {
                     return updatedRoomConversation;
                 } else {
                     return conversation;
@@ -922,8 +995,55 @@ const chatSlice = createSlice({
             state.isLoading = false;
             state.isError = action.error.message;
         });
+        // updating state after deleting message
+        builder.addCase(deleteMessageForSingleUser.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(deleteMessageForSingleUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            const updatedMessage = action.payload;
+            const { _id, roomId } = updatedMessage;
+            const updatedRoomMessages = state.roomConversation.messages.filter(message => message._id !== _id);
+            const updatedRoomConversation = { ...state.roomConversation, messages: updatedRoomMessages };
+            const filteredAllRoomConversations = state.allRoomConversations.filter(conversation => conversation.user.roomId !== roomId);
+            const updateRecentConversations = (conversations) => {
+                return conversations.map((conversation) => {
+                    const { message } = conversation;
+                    if (message.roomId === roomId) {
+                        if (message._id === _id) {
+                            return { ...conversation, message: updatedRoomMessages[updatedRoomMessages.length - 1] };
+                        } else {
+                            return conversation;
+                        };
+                    } else {
+                        return conversation;
+                    };
+                });
+            };
+            state.recentConversations = updateRecentConversations(state.recentConversations);
+            state.tempRecentConversations = updateRecentConversations(state.tempRecentConversations);
+            state.roomConversation = updatedRoomConversation;
+            state.allRoomConversations = [...filteredAllRoomConversations, updatedRoomConversation];
+        });
+        builder.addCase(deleteMessageForSingleUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // updating state after deleting message for everyone
+        builder.addCase(deleteMessageForEveryone.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(deleteMessageForEveryone.fulfilled, (state, action) => {
+            state.isLoading = false;
+        });
+        builder.addCase(deleteMessageForEveryone.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
     }
 });
 
-export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, updateSeenMessages, updateDeliveredMessages, updateEditedMessages } = chatSlice.actions;
+export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, updateSeenMessages, updateDeliveredMessages, updateEditedMessage, updateEveryoneDeletedMessage } = chatSlice.actions;
 export default chatSlice.reducer;

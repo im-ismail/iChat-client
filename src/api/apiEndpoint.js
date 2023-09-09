@@ -25,3 +25,5 @@ export const roomConversationEndpoint = `${serverUrl}/room`;
 export const editMessageEndpoint = `${serverUrl}/room/message`;
 export const markDeliveredEndpoint = `${serverUrl}/room/message/mark-delivered`;
 export const markSeenEndpoint = `${serverUrl}/room/message/mark-seen`;
+export const singleMessageDeleteEndpoint = `${serverUrl}/room/message/single`;
+export const everyoneMessageDeleteEndpoint = `${serverUrl}/room/message/everyone`;

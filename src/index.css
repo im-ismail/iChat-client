@@ -183,6 +183,7 @@ select {
 }
 
 .main-page {
+  position: relative;
   width: 40vw;
   height: 100%;
   display: flex;
@@ -268,7 +269,7 @@ select {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40vw;
+  width: 100%;
   height: 100vh;
   background-color: #ffffff;
   border-right: 1px solid rgb(228, 225, 225);
@@ -307,7 +308,7 @@ select {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40vw;
+  width: 100%;
   height: 100vh;
   background-color: #f1f4f4;
   border-right: 1px solid rgb(228, 225, 225);
@@ -355,7 +356,7 @@ select {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40vw;
+  width: 100%;
   height: 100vh;
   background-color: #f1f4f4;
   border-right: 1px solid rgb(228, 225, 225);
@@ -373,8 +374,6 @@ select {
   /* flex: 1; */
   overflow: auto;
   height: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .list {
@@ -428,6 +427,7 @@ select {
   font-size: 14px;
   display: flex;
   gap: 5px;
+  overflow: hidden;
 }
 
 .list .details .second-line .fa-solid {
@@ -435,8 +435,12 @@ select {
 }
 
 .unread-messages-count {
+  height: 20px;
+  min-width: 20px;
+  max-width: 30px;
   font-size: 12px;
   padding: 1px 7px;
+  padding: 1.5px 7px 1px 7px;
   background-color: rgb(12, 187, 91);
   border-radius: 50%;
 }
@@ -512,7 +516,7 @@ select {
   right: 0;
   width: 60vw;
   height: 100vh;
-  background-color: #e2fffe;
+  background-color: rgb(243, 243, 243);
   z-index: 1;
   display: none;
 }
@@ -691,6 +695,14 @@ textarea:focus {
   margin-right: -3px;
 }
 
+.messages .received .deleted-message {
+  color: rgb(133, 133, 133);
+}
+
+.messages .sent .deleted-message {
+  color: rgb(230, 230, 230);
+}
+
 .popup-modal {
   position: absolute;
   top: 30px;
@@ -858,14 +870,6 @@ textarea:focus {
     width: 100%;
   }
 
-  .user-list-page {
-    width: 100%;
-  }
-
-  .profile-page {
-    width: 100%;
-  }
-
   .chat-page {
     width: 100%;
     display: none;
@@ -876,5 +880,30 @@ textarea:focus {
     height: 350px;
     max-height: 80vh;
     width: 100vw;
+  }
+
+  .chat-partner-profile-page {
+    width: 100%;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 768px) {
+  .main-page {
+    width: 50vw;
+  }
+
+  .chat-page {
+    width: 50vw;
+  }
+
+  .emoji-picker-container {
+    width: 50vw;
+    left: 0;
+    height: 350px;
+    max-height: 80vh;
+  }
+
+  .chat-partner-profile-page {
+    width: 50vw;
   }
 }
