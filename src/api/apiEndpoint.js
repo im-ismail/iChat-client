@@ -27,3 +27,4 @@ export const markDeliveredEndpoint = `${serverUrl}/room/message/mark-delivered`;
 export const markSeenEndpoint = `${serverUrl}/room/message/mark-seen`;
 export const singleMessageDeleteEndpoint = `${serverUrl}/room/message/single`;
 export const everyoneMessageDeleteEndpoint = `${serverUrl}/room/message/everyone`;
+export const deleteChatEndpoint = `${serverUrl}/room/message/chat`;

@@ -40,7 +40,7 @@ const ShowChat = ({ newChat, roomConversation, makeItResponsive, setJoinedRooms,
                     </div>
                 </div>
             </div>
-            <ChatPartnerProfile user={user} profileRef={profileRef} />
+            <ChatPartnerProfile user={user} profileRef={profileRef} makeItResponsive={makeItResponsive} />
             <div className="messages-container">
                 {roomConversation && <ShowMessages roomConversation={roomConversation} chatPageRef={chatPageRef} />}
             </div>

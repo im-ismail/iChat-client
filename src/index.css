@@ -515,8 +515,8 @@ select {
   top: 0;
   right: 0;
   width: 60vw;
-  height: 100vh;
-  background-color: rgb(243, 243, 243);
+  min-height: 100vh;
+  background-color: #f1f4f4;
   z-index: 1;
   display: none;
 }
@@ -526,6 +526,7 @@ select {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .chat-partner-profile-page .profile-pic img {
@@ -536,10 +537,31 @@ select {
 }
 
 .chat-partner-profile-page .profile .details {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  border-top: 1px solid rgb(228, 225, 225);
+}
+
+.chat-partner-profile-page .profile p {
+  line-height: 35px;
+  border-bottom: 1px solid rgb(228, 225, 225);
+  padding-left: 35%;
+}
+
+.chat-partner-profile-page .profile .features {
+  width: 100%;
+  border-top: 1px solid rgb(228, 225, 225);
+}
+
+.chat-partner-profile-page .profile .features p {
+  cursor: pointer;
+}
+
+.chat-partner-profile-page .profile .features>p {
+  color: rgb(234, 31, 31);
+}
+
+.chat-partner-profile-page .profile .features p:hover {
+  background-color: #bbd1d1;
 }
 
 /* styling chat partner profile end */

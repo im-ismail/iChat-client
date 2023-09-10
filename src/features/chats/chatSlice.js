@@ -5,6 +5,7 @@ import { checkRooms, joinRoom } from '../../services/socket';
 import {
     PassResetEndpoint,
     createRoomEndpoint,
+    deleteChatEndpoint,
     deleteUserEndpoint,
     editMessageEndpoint,
     emailChangeEndpoint,
@@ -462,6 +463,23 @@ export const deleteMessageForEveryone = createAsyncThunk('chat/deleteForEveryone
         throw new Error(data.message);
     };
     return data.updatedMessage;
+});
+// deleting entire chat
+export const deleteChat = createAsyncThunk('chat/deleteChat', async (roomId) => {
+    const res = await fetch(deleteChatEndpoint, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ roomId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.message);
+    };
+    toast(data.message);
+    return data.roomId;
 });
 
 // Defining initial state
@@ -1039,6 +1057,23 @@ const chatSlice = createSlice({
             state.isLoading = false;
         });
         builder.addCase(deleteMessageForEveryone.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = action.error.message;
+        });
+        // removing conversation from state after deleting
+        builder.addCase(deleteChat.pending, (state) => {
+            state.isLoading = true;
+            state.isError = null;
+        });
+        builder.addCase(deleteChat.fulfilled, (state, action) => {
+            const roomId = action.payload;
+            state.isLoading = false;
+            state.recentConversations = state.recentConversations.filter(conversation => conversation.user.roomId !== roomId);
+            state.tempRecentConversations = state.tempRecentConversations.filter(conversation => conversation.user.roomId !== roomId);
+            state.roomConversation = null;
+            state.allRoomConversations = state.allRoomConversations.filter(conversation => conversation.user.roomId !== roomId);
+        });
+        builder.addCase(deleteChat.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = action.error.message;
         });
