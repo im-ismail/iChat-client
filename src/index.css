@@ -88,6 +88,12 @@ button {
     display: none;
   }
 
+  .messages-container {
+    height: 0;
+    min-height: calc(92.7vh - (60px + 60px));
+    max-height: calc(100% - (60px + 60px));
+  }
+
   .messages .first-message .show-date {
     padding: 4px 8px 6px 8px;
   }

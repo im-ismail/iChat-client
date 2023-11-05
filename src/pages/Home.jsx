@@ -123,7 +123,11 @@ const Home = () => {
 
     // setting height after page load because causing layout issues in mobile devices because of address bar and checking orientation
     const checkPhoneOrientation = () => {
-        if (window.orientation === 90 && window.matchMedia('(max-height:500px)')) {
+        // setting height to fix layout issue in mobile browser
+        if (homePageRef.current) {
+            homePageRef.current.style.height = `${window.innerHeight}px`;
+        };
+        if (window.orientation === 90 && window.matchMedia('(max-height:600px)')) {
             setOrientation(true);
         } else {
             setOrientation(false);
@@ -131,14 +135,18 @@ const Home = () => {
     };
 
     useEffect(() => {
-        homePageRef.current.style.height = `${window.innerHeight}px`;
-        window.addEventListener('orientationchange', checkPhoneOrientation);
-        // initial call
-        checkPhoneOrientation();
-
-        return (() => {
-            window.removeEventListener('orientationchange', checkPhoneOrientation);
-        })
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent);
+        if (isMobile) {
+            window.addEventListener('orientationchange', checkPhoneOrientation);
+            window.addEventListener('resize', checkPhoneOrientation);
+            // initial call
+            checkPhoneOrientation();
+            // cleaning up event listener
+            return (() => {
+                window.removeEventListener('orientationchange', checkPhoneOrientation);
+                window.addEventListener('resize', checkPhoneOrientation);
+            });
+        };
     }, []);
 
     return (<>{isOrientationLandscape ?
