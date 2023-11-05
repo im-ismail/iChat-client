@@ -1,0 +1,117 @@
+.profile-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #f1f4f4;
+    border-right: 1px solid rgb(228, 225, 225);
+    display: none;
+    z-index: 2;
+}
+
+.profile-page .user-profile {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgb(228, 225, 225);
+    height: max-content;
+    background-color: #f1f4f4;
+    color: black;
+}
+
+.profile-page .profile-pic {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-page .user-profile img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.profile-page .user-profile .edit-pen {
+    font-size: 1.4rem;
+    color: rgb(86, 86, 193);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.profile-page .user-profile .edit-pen:hover {
+    color: rgb(4, 31, 141);
+}
+
+.menu-item {
+    text-align: center;
+    line-height: 45px;
+    border-bottom: 1px solid rgb(228, 225, 225);
+}
+
+.clickable:hover {
+    cursor: pointer;
+    background-color: #bbd1d1;
+}
+
+.edit-page,
+.delete-page,
+.profile-pic-update-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #f1f4f4;
+    border-right: 1px solid rgb(228, 225, 225);
+    display: none;
+    z-index: 3;
+}
+
+.edit-form {
+    margin-top: 20px;
+}
+
+.logout-popup {
+    width: 300px;
+    height: max-content;
+    padding: 15px 10px;
+    background-color: #fffcfc;
+    border: 1px solid grey;
+    border-radius: 6px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    z-index: 3;
+    display: none;
+}
+
+.logout-popup .buttons {
+    margin: 15px 10px 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-popup .buttons button {
+    padding: 8px 40px;
+    border-radius: 5px;
+    background-color: rgb(11, 109, 11);
+    color: white;
+    border: none;
+}
+
+.logout-popup .buttons button:hover {
+    background-color: rgb(16, 127, 16);
+}
+
+.logout-popup .buttons .logout {
+    background-color: rgb(192, 59, 42);
+}
+
+.logout-popup .buttons .logout:hover {
+    background-color: rgb(225, 71, 51);
+}

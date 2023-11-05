@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import '../styles/chatPartnerProfile.css';
 import { serverUrl } from '../api/apiEndpoint';
 import msToLastSeen from '../helper/msToLastSeen';
 import { deleteChat } from '../features/chats/chatSlice';
@@ -52,15 +53,15 @@ const ChatPartnerProfile = ({ user, profileRef, makeItResponsive }) => {
             </div>
             <div className="profile">
                 <div className="profile-pic">
-                    <a href={`${serverUrl}/${image}`} target='_blank'><img src={`${serverUrl}/${image}`} alt={name} /></a>
+                    <a href={`${serverUrl}/${image}`} target="_blank" rel="noopener noreferrer"><img src={`${serverUrl}/${image}`} alt={name} /></a>
                 </div>
                 <div className="details">
-                    <p>Name: {name}</p>
-                    <p>{showEmail}</p>
-                    <p className="last-seen">{typing ? 'typing...' : online ? 'Online' : msToLastSeen(lastSeen)}</p>
+                    <p className='menu-item'>Name: {name}</p>
+                    <p className='menu-item'>{showEmail}</p>
+                    <p className="menu-item last-seen">{typing ? 'typing...' : online ? 'Online' : msToLastSeen(lastSeen)}</p>
                 </div>
                 {roomId && <div className="features">
-                    <p onClick={showDeletePopup}>Delete conversation</p>
+                    <p className='menu-item clickable' onClick={showDeletePopup}>Delete conversation</p>
                 </div>}
             </div>
             <div className='delete-popup' ref={deletePopupRef}>

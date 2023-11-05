@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import '../styles/showChat.css';
 import { setNewChat, setRoomConversation } from '../features/chats/chatSlice';
 import { serverUrl } from '../api/apiEndpoint';
 import msToLastSeen from '../helper/msToLastSeen';

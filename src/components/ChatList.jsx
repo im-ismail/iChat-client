@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import '../styles/chatList.css';
 import msToTime from '../helper/msToTime';
 import { useSelector } from 'react-redux';
 import Loading from './Loading';
@@ -54,12 +55,12 @@ const ChatList = ({ fetchRoomConversation, showUserList }) => {
                                         {!delivered.status ? <i className="fa-solid fa-check"></i> : <i style={read.status ? { color: 'rgb(57, 57, 247)' } : null} className="fa-solid fa-check-double"></i>}
                                     </span>}
                                     {deletedForEveryone && senderId === otherUserId ?
-                                        <span>
+                                        <span className='text'>
                                             <i className="fa-solid fa-ban"></i> <i>This message was deleted</i>
-                                        </span> : deletedForEveryone ? <span>
+                                        </span> : deletedForEveryone ? <span className='text'>
                                             <i className="fa-solid fa-ban"></i> <i>You deleted this message</i>
-                                        </span> : <span style={{ fontWeight }}>
-                                            {content.length > 25 ? content.slice(0, 25) + '...' : content}
+                                        </span> : <span className='text' style={{ fontWeight }}>
+                                            {content}
                                         </span>
                                     }
                                 </>}

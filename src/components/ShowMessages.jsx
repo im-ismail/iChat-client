@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import '../styles/showMessages.css';
 import msToTime from '../helper/msToTime';
 import { useDispatch } from 'react-redux';
 import { deleteMessageForEveryone, deleteMessageForSingleUser, editMessage, markMessagesAsSeen } from '../features/chats/chatSlice';

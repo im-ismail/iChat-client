@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import EmojiPicker from 'emoji-picker-react';
+import '../styles/sendMessage.css';
 import { emitTyping } from '../services/socket';
 import { sendMessage } from '../features/chats/chatSlice';
 

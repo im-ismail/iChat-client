@@ -6,9 +6,6 @@
 .pnp.js
 .env
 
-# user defined folders
-src/styles
-
 # testing
 /coverage
 

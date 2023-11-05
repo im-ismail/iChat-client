@@ -509,8 +509,8 @@ const chatSlice = createSlice({
         filterUsersList: (state, action) => {
             const inputValue = action.payload;
             const filteredUsers = state.tempUsers.filter((user) => {
-                const { name, number } = user;
-                return name.toLowerCase().includes(inputValue.toLowerCase()) || number.toString().includes(inputValue);
+                const { name, email } = user;
+                return name.toLowerCase().includes(inputValue.toLowerCase()) || email.includes(inputValue);
             });
             state.users = filteredUsers;
         },
@@ -518,8 +518,8 @@ const chatSlice = createSlice({
             const inputValue = action.payload;
             const filteredchats = state.tempRecentConversations.filter((conversation) => {
                 const { user } = conversation;
-                const { name, number } = user;
-                return name.toLowerCase().includes(inputValue.toLowerCase()) || number.toString().includes(inputValue);
+                const { name, email } = user;
+                return name.toLowerCase().includes(inputValue.toLowerCase()) || email.includes(inputValue);
             });
             state.recentConversations = filteredchats;
         },

@@ -1,0 +1,39 @@
+.chat-partner-profile-page {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60vw;
+    min-height: 100vh;
+    background-color: #f1f4f4;
+    z-index: 1;
+    display: none;
+}
+
+.chat-partner-profile-page .profile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.chat-partner-profile-page .profile-pic img {
+    width: 100px;
+    height: 100px;
+    margin-top: 20px;
+    border-radius: 50%;
+}
+
+.chat-partner-profile-page .profile .details {
+    width: 100%;
+    border-top: 1px solid rgb(228, 225, 225);
+}
+
+.chat-partner-profile-page .profile .features {
+    width: 100%;
+    border-top: 1px solid rgb(228, 225, 225);
+}
+
+.chat-partner-profile-page .profile .features>p {
+    color: rgb(234, 31, 31);
+}

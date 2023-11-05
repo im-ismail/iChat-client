@@ -1,0 +1,48 @@
+.user-list-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid rgb(228, 225, 225);
+    display: none;
+    z-index: 2;
+}
+
+.close {
+    background-color: #352aa9;
+    color: rgb(222, 222, 222);
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close .fa-circle-xmark {
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.user-list {
+    overflow: auto;
+}
+
+.user-list .user {
+    padding: 5px 10px;
+    display: flex;
+    gap: 1rem;
+    cursor: pointer;
+    background-color: #f1f4f4;
+    border-bottom: 1px solid rgb(228, 225, 225);
+    align-items: center;
+}
+
+.user-list .user .info {
+    overflow: hidden;
+}
+
+.user-list .user .info .name,
+.user-list .user .info .email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

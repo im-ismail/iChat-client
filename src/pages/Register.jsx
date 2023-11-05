@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-// import '../styles/login.css';
+import '../styles/register.css';
 import { completeRegistration, resendOtpForRegistration, userRegistration } from '../features/chats/chatSlice';
 
 const Register = () => {

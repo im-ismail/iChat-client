@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import '../styles/home.css';
 import UserList from '../components/UserList';
 import { filterChatList, getRecentConversations, getUsers, getConversationByRoomId, setRoomConversation, setNewChat } from '../features/chats/chatSlice';
 import ChatList from '../components/ChatList';
@@ -13,6 +14,7 @@ const Home = () => {
 
     const { isLoggedIn, currentUser, roomConversation, allRoomConversations, newChat } = useSelector(state => state.chat);
     const navigate = useNavigate();
+    const homePageRef = useRef();
     const userListRef = useRef();
     const profileRef = useRef();
     const mainPageRef = useRef();
@@ -21,6 +23,7 @@ const Home = () => {
     const [joinedRooms, setJoinedRooms] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isOrientationLandscape, setOrientation] = useState(false);
 
     // Showing all user list
     const showUserList = () => {
@@ -118,8 +121,32 @@ const Home = () => {
         };
     }, [isLoggedIn]);
 
-    return (
-        <div className="app">
+    // setting height after page load because causing layout issues in mobile devices because of address bar and checking orientation
+    const checkPhoneOrientation = () => {
+        if (window.orientation === 90 && window.matchMedia('(max-height:500px)')) {
+            setOrientation(true);
+        } else {
+            setOrientation(false);
+        };
+    };
+
+    useEffect(() => {
+        homePageRef.current.style.height = `${window.innerHeight}px`;
+        window.addEventListener('orientationchange', checkPhoneOrientation);
+        // initial call
+        checkPhoneOrientation();
+
+        return (() => {
+            window.removeEventListener('orientationchange', checkPhoneOrientation);
+        })
+    }, []);
+
+    return (<>{isOrientationLandscape ?
+        <div className='landscape' ref={homePageRef}>
+            <h3>Landscape mode for mobile devices isn't supported yet.</h3>
+            <h4>Please rotate your phone.</h4>
+        </div> :
+        <div className="app" ref={homePageRef}>
             <div className="main-page" ref={mainPageRef}>
                 <div className="user-profile">
                     <div className="user-profile-details">
@@ -153,6 +180,7 @@ const Home = () => {
                 makeItResponsive={makeItResponsive}
             />
         </div>
+    }</>
     )
 }
 

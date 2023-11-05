@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
+import '../styles/userList.css';
 import Loading from './Loading';
 import { filterUsersList, setNewChat, setRoomConversation } from '../features/chats/chatSlice';
 import { serverUrl } from '../api/apiEndpoint';
@@ -62,9 +63,9 @@ const UserList = ({ userListRef, fetchRoomConversation, makeItResponsive }) => {
                                     <div>
                                         <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
                                     </div>
-                                    <div>
-                                        <h3 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h3>
-                                        <p>{showEmail}</p>
+                                    <div className='info'>
+                                        <h3 className="name">{name} {online && <i className="fa-solid fa-circle"></i>}</h3>
+                                        <p className='email'>{showEmail}</p>
                                     </div>
                                 </div>
                             })

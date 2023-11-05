@@ -1,0 +1,224 @@
+.messages-container {
+    width: 100%;
+    height: calc(100% - (60px + 60px));
+    background-color: #e9edef;
+    position: relative;
+}
+
+.messages {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    padding: 10px 0;
+}
+
+.messages .message {
+    display: flex;
+    gap: 5px;
+    max-width: 80%;
+    padding: 2px 8px 5px 8px;
+    margin: 4px 0;
+    position: relative;
+}
+
+/* breaking a long single word if it exceeds container */
+.messages .message .message-content {
+    overflow-wrap: anywhere;
+}
+
+.messages .first-message {
+    /* overflow: auto; */
+    padding-top: 1px;
+}
+
+.messages .show-date {
+    width: fit-content;
+    padding: 4px 10px;
+    background-color: #f8f8f8;
+    margin: 10px auto;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.messages .sent {
+    display: flex;
+    padding: 0 20px;
+    justify-content: flex-end;
+}
+
+.messages .sent .message {
+    background-color: rgb(72, 141, 72);
+    color: #fff;
+    border-radius: 10px 0px 10px 10px;
+}
+
+.messages .received {
+    display: flex;
+    padding: 0 20px;
+    justify-content: flex-start;
+}
+
+.messages .received .message {
+    background-color: #fff;
+    border-radius: 0px 10px 10px 10px;
+}
+
+.messages .message .info {
+    font-size: 12px;
+    color: rgb(180, 182, 179);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: -4px;
+    margin-right: -3px;
+}
+
+.messages .received .deleted-message {
+    color: rgb(133, 133, 133);
+}
+
+.messages .sent .deleted-message {
+    color: rgb(230, 230, 230);
+}
+
+.popup-modal {
+    position: absolute;
+    top: 30px;
+    background-color: #fffcfc;
+    color: black;
+    border: 1px solid grey;
+    border-radius: 6px;
+    z-index: 999;
+    width: 250px;
+    display: none;
+}
+
+.sent .message .popup-modal {
+    right: 10px;
+}
+
+.received .message .popup-modal {
+    left: 10px;
+}
+
+.popup-modal .first-row {
+    border-bottom: 1px solid grey;
+    padding: 5px;
+}
+
+.popup-modal .second-row {
+    padding: 5px;
+}
+
+.popup-modal p {
+    line-height: 30px;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.popup-modal p:hover {
+    background-color: #eceff1;
+    border-radius: 6px;
+}
+
+.popup-modal .icons {
+    color: rgb(138, 138, 138);
+}
+
+.popup-modal .single-delete {
+    color: rgb(232, 185, 31);
+}
+
+.popup-modal .all-delete {
+    color: rgb(192, 59, 42);
+}
+
+.popup-modal .message-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: capitalize;
+    cursor: unset;
+}
+
+.popup-modal .message-info:hover {
+    background-color: unset;
+}
+
+.popup-modal .message-info .time {
+    font-size: 14px;
+}
+
+.edit-popup {
+    width: 300px;
+    height: max-content;
+    padding: 15px 10px;
+    background-color: #fffcfc;
+    border: 1px solid grey;
+    border-radius: 6px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    display: none;
+}
+
+.edit-popup input {
+    background-color: rgb(228, 228, 228);
+}
+
+.delete-popup {
+    width: 300px;
+    height: max-content;
+    padding: 15px 10px;
+    background-color: #fffcfc;
+    border: 1px solid grey;
+    border-radius: 6px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    display: none;
+}
+
+.delete-popup .buttons {
+    margin: 15px 10px 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-popup .buttons button {
+    padding: 8px 40px;
+    border-radius: 5px;
+    background-color: rgb(11, 109, 11);
+    color: white;
+    border: none;
+}
+
+.delete-popup .buttons button:hover {
+    background-color: rgb(16, 127, 16);
+}
+
+.delete-popup .buttons .delete {
+    background-color: rgb(192, 59, 42);
+}
+
+.delete-popup .buttons .delete:hover {
+    background-color: rgb(225, 71, 51);
+}
+
+/* .messages .message-time {
+  font-size: 12px;
+  color: rgb(180, 182, 179);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-bottom: -4px;
+  margin-right: -3px;
+  padding-left: 5px;
+} */

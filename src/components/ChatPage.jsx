@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import '../styles/chatPage.css';
 import Loading from './Loading';
 import ShowChat from './ShowChat';
 

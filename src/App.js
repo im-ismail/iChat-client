@@ -1,17 +1,17 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import io from 'socket.io-client';
+import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Register from "./pages/Register";
 import Error from "./pages/Error";
-import { useEffect } from "react";
+import ResetPassword from "./pages/ResetPassword";
 import { authenticateUser } from "./features/chats/chatSlice";
-import io from 'socket.io-client';
 import configureSocket from "./services/socket";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { serverUrl } from "./api/apiEndpoint";
-import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 
