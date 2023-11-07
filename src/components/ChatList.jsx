@@ -8,7 +8,7 @@ import { markMessagesAsDelivered } from '../features/chats/chatSlice';
 
 const ChatList = ({ fetchRoomConversation, showUserList }) => {
 
-    const { isLoading, isError, recentConversations } = useSelector(state => state.chat);
+    const { isLoading, isError, recentConversations, pendingMessages } = useSelector(state => state.chat);
 
     useEffect(() => {
         if (recentConversations?.length) {
@@ -31,44 +31,81 @@ const ChatList = ({ fetchRoomConversation, showUserList }) => {
             </>
             {recentConversations && recentConversations.map((conversation, index) => {
                 const { user, message } = conversation;
-                const { _id: otherUserId, roomId, name, image, online, typing } = user;
-                const { content, sentBy, delivered, read, unreadMessagesCount, deletedForEveryone, createdAt } = message;
-                const { _id: senderId } = sentBy;
 
-                const { result, sendingTime } = msToTime(createdAt);
-                const fontWeight = !read.status && otherUserId === senderId ? '500' : '';
+                const matchedPendingMessages = pendingMessages.filter(element => element.roomId === user.roomId);
+                const matchedPendingMessage = matchedPendingMessages[matchedPendingMessages.length - 1];
+                const successMessageTime = new Date(message.createdAt);
+                const pendingMessageTime = new Date(matchedPendingMessage?.timeStamp);
 
-                return <div className='list' key={index} onClick={() => fetchRoomConversation(roomId, otherUserId)}>
-                    <div>
-                        <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
+                if (matchedPendingMessage && pendingMessageTime > successMessageTime) {
+                    const { content, timeStamp, roomId: pendingMessageRoomId, receiver } = matchedPendingMessage;
+                    const { name, image, online, typing } = user;
+                    const { unreadMessagesCount } = message;
+                    const { result, sendingTime } = msToTime(timeStamp);
 
-                    </div>
-                    <div className="details">
-                        <div className="first-line">
-                            <h4 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h4>
-                            <p className="date">{result === 'today' ? sendingTime : result === 'yesterday' ? 'Yesterday' : result}</p>
+                    return <div className='list' key={index} onClick={() => fetchRoomConversation(pendingMessageRoomId, receiver)}>
+                        <div>
+                            <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
                         </div>
-                        <div className="second-line">
-                            <p className='message-info'>
-                                {typing ? <span className='typing'>typing...</span> : <>
-                                    {senderId !== otherUserId && !deletedForEveryone && <span>
-                                        {!delivered.status ? <i className="fa-solid fa-check"></i> : <i style={read.status ? { color: 'rgb(57, 57, 247)' } : null} className="fa-solid fa-check-double"></i>}
-                                    </span>}
-                                    {deletedForEveryone && senderId === otherUserId ?
+                        <div className="details">
+                            <div className="first-line">
+                                <h4 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h4>
+                                <p className="date">{result === 'today' ? sendingTime : result === 'yesterday' ? 'Yesterday' : result}</p>
+                            </div>
+                            <div className="second-line">
+                                <p className='message-info'>
+                                    {typing ? <span className='typing'>typing...</span> : <>
+                                        <span><i className="fa-regular fa-clock"></i></span>
                                         <span className='text'>
-                                            <i className="fa-solid fa-ban"></i> <i>This message was deleted</i>
-                                        </span> : deletedForEveryone ? <span className='text'>
-                                            <i className="fa-solid fa-ban"></i> <i>You deleted this message</i>
-                                        </span> : <span className='text' style={{ fontWeight }}>
                                             {content}
                                         </span>
-                                    }
-                                </>}
-                            </p>
-                            {unreadMessagesCount > 0 && <p className='unread-messages-count'>{unreadMessagesCount < 99 ? unreadMessagesCount : 99}</p>}
+                                    </>}
+                                </p>
+                                {unreadMessagesCount > 0 && <p className='unread-messages-count'>{unreadMessagesCount < 99 ? unreadMessagesCount : 99}</p>}
+                            </div>
                         </div>
                     </div>
-                </div>
+                } else {
+                    const { user, message } = conversation;
+                    const { _id: otherUserId, roomId, name, image, online, typing } = user;
+                    const { content, sentBy, delivered, read, unreadMessagesCount, deletedForEveryone, createdAt } = message;
+                    const { _id: senderId } = sentBy;
+
+                    const { result, sendingTime } = msToTime(createdAt);
+                    const fontWeight = !read.status && otherUserId === senderId ? '500' : '';
+
+                    return <div className='list' key={index} onClick={() => fetchRoomConversation(roomId, otherUserId)}>
+                        <div>
+                            <img src={`${serverUrl}/${image}`} alt="dp" className="chat-partner-profile-pic" />
+
+                        </div>
+                        <div className="details">
+                            <div className="first-line">
+                                <h4 className="chat-partner-name">{name} {online && <i className="fa-solid fa-circle"></i>}</h4>
+                                <p className="date">{result === 'today' ? sendingTime : result === 'yesterday' ? 'Yesterday' : result}</p>
+                            </div>
+                            <div className="second-line">
+                                <p className='message-info'>
+                                    {typing ? <span className='typing'>typing...</span> : <>
+                                        {senderId !== otherUserId && !deletedForEveryone && <span>
+                                            {!delivered.status ? <i className="fa-solid fa-check"></i> : <i style={read.status ? { color: 'rgb(57, 57, 247)' } : null} className="fa-solid fa-check-double"></i>}
+                                        </span>}
+                                        {deletedForEveryone && senderId === otherUserId ?
+                                            <span className='text'>
+                                                <i className="fa-solid fa-ban"></i> <i>This message was deleted</i>
+                                            </span> : deletedForEveryone ? <span className='text'>
+                                                <i className="fa-solid fa-ban"></i> <i>You deleted this message</i>
+                                            </span> : <span className='text' style={{ fontWeight }}>
+                                                {content}
+                                            </span>
+                                        }
+                                    </>}
+                                </p>
+                                {unreadMessagesCount > 0 && <p className='unread-messages-count'>{unreadMessagesCount < 99 ? unreadMessagesCount : 99}</p>}
+                            </div>
+                        </div>
+                    </div>
+                }
             })
             }
             {!recentConversations?.length && <div className='empty-container'>

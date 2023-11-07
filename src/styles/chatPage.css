@@ -1,4 +1,5 @@
 .chat-page {
     height: 100%;
     width: 60vw;
+    user-select: none;
 }

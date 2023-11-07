@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import '../styles/showMessages.css';
 import msToTime from '../helper/msToTime';
 import { useDispatch } from 'react-redux';
-import { deleteMessageForEveryone, deleteMessageForSingleUser, editMessage, markMessagesAsSeen } from '../features/chats/chatSlice';
+import { deleteMessageForEveryone, deleteMessageForSingleUser, editMessage, markMessagesAsSeen, updatePendingMessages } from '../features/chats/chatSlice';
 
-const ShowMessages = ({ roomConversation, chatPageRef }) => {
+const ShowMessages = ({ roomConversation, chatPageRef, pendingMessages }) => {
 
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentModal, setCurrentModal] = useState();
@@ -96,7 +96,7 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         return () => {
             container.removeEventListener('scroll', handleMessageScroll);
         };
-    }, [messages]);
+    }, [messages, pendingMessages]);
 
     // from here handling popup modal starts to manipulate message
     // handling long press on messages
@@ -198,6 +198,12 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
         };
     }, [currentModal]);
 
+    // deleting pending message
+    const deletePendingMessage = (message) => {
+        const filteredPendingMessages = pendingMessages.filter(elem => elem._id !== message._id);
+        localStorage.setItem('pendingMessages', JSON.stringify(filteredPendingMessages));
+        dispatch(updatePendingMessages(filteredPendingMessages));
+    };
 
     return (
         <div className="messages" id='messages' ref={messagesRef}>
@@ -281,6 +287,49 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                     }
                 })
             }
+            {/* populating pending messages if any */}
+            {
+                pendingMessages.length > 0 && pendingMessages.map((message, index) => {
+                    const { _id, content, timeStamp, roomId: pendingMessageRoomId, receiver } = message;
+                    const { sendingTime, result, dayAndDate } = msToTime(timeStamp);
+                    if (pendingMessageRoomId === roomId && receiver === otherUserId) {
+                        // defining popup modal
+                        const popupModal = <div className='popup-modal' ref={ref => popupModalRefs.current[_id] = ref}>
+                            <div className='second-row'>
+                                <p onClick={() => deletePendingMessage(message)}>
+                                    <i className="fa-solid fa-trash icons all-delete"></i><span>Delete this message</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        // creating message element
+                        const messageElement = <div className='message' onContextMenu={e => handleLongPress(e, message)}>
+                            <p className="message-content">{content}</p>
+                            <p className='info'>
+                                <span className="message-time">{sendingTime}</span>
+                                <span><i className="fa-regular fa-clock"></i></span>
+                            </p>
+                            {popupModal}
+                        </div>
+
+                        if (initialDate !== dayAndDate) {
+                            initialDate = dayAndDate;
+                            return <div key={index} ref={(ref) => (messageRefs.current[_id] = ref)} className='first-message'>
+                                <div className="show-date">
+                                    <p>{result === 'today' ? 'Today' : result === 'yesterday' ? 'Yesterday' : dayAndDate}</p>
+                                </div>
+                                <div className="sent">
+                                    {messageElement}
+                                </div>
+                            </div>
+                        } else {
+                            return <div className="sent" key={index} ref={(ref) => (messageRefs.current[_id] = ref)}>
+                                {messageElement}
+                            </div>
+                        }
+                    }
+                })
+            }
             {/* popup modal for editing message */}
             <div className="edit-popup" ref={editFormRef}>
                 <form onSubmit={handleEditMessage}>
@@ -292,7 +341,7 @@ const ShowMessages = ({ roomConversation, chatPageRef }) => {
                     </div>
                 </form>
             </div>
-            {/* popup modal for de3leting messages */}
+            {/* popup modal for deleting messages */}
             <div className='delete-popup' ref={deleteRef}>
                 <p>{deleteType === 'everyone' ? 'This message will be deleted for everyone in this chat.' : 'This message will be deleted for you.'}</p>
                 <div className='buttons'>

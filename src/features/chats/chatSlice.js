@@ -177,7 +177,7 @@ const initiateChat = async (userId) => {
 };
 
 // send message and update conversation
-export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message, roomId, otherUserId }, { getState, dispatch }) => {
+export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ message, roomId, otherUserId }, { getState }) => {
     const { newChat } = getState().chat;
     if (!roomId) {
         // initiating room if not already created
@@ -496,6 +496,8 @@ const initialState = {
     roomConversation: null,
     allRoomConversations: [],
     newChat: null,
+    isConnected: true,
+    pendingMessages: JSON.parse(localStorage.getItem('pendingMessages')) || []
 };
 
 // Creating slicer
@@ -769,6 +771,12 @@ const chatSlice = createSlice({
                     return conversation;
                 };
             });
+        },
+        updateConnectionStatus: (state, action) => {
+            state.isConnected = action.payload;
+        },
+        updatePendingMessages: (state, action) => {
+            state.pendingMessages = action.payload;
         },
     },
     extraReducers: builder => {
@@ -1080,5 +1088,5 @@ const chatSlice = createSlice({
     }
 });
 
-export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, updateSeenMessages, updateDeliveredMessages, updateEditedMessage, updateEveryoneDeletedMessage } = chatSlice.actions;
+export const { setRoomConversation, filterUsersList, filterChatList, setNewChat, updateReceivedConversation, updateUserStatus, updateTypingStatus, updateSeenMessages, updateDeliveredMessages, updateEditedMessage, updateEveryoneDeletedMessage, updateConnectionStatus, updatePendingMessages } = chatSlice.actions;
 export default chatSlice.reducer;

@@ -50,7 +50,6 @@ const Home = () => {
         const smallScreen = window.matchMedia('(max-width:600px)');
         const mainPage = mainPageRef.current;
         const chatPage = chatPageRef.current;
-        const mainPageStyle = window.getComputedStyle(mainPage);
         const chatPageStyle = window.getComputedStyle(chatPage);
         if (smallScreen.matches) {
             if (chatPageStyle.display === 'none') {
@@ -127,7 +126,8 @@ const Home = () => {
         if (homePageRef.current) {
             homePageRef.current.style.height = `${window.innerHeight}px`;
         };
-        if (window.orientation === 90 && window.matchMedia('(max-height:600px)')) {
+        // disabling landscape view for devices whoose height in landscape mode is less than 600px
+        if (window.orientation === 90 && window.matchMedia('(max-height:600px)').matches) {
             setOrientation(true);
         } else {
             setOrientation(false);
